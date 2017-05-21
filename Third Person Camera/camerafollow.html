@@ -12,30 +12,39 @@
 <script>
     var alfa = 4.71238898038469;
     var canvas = document.getElementById("myCanvas");
+    canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
+    document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
     var engine = new BABYLON.Engine(canvas, true);
-    engine.isPointerLock = true;
     var scene = new BABYLON.Scene(engine);
 
     var camera = new BABYLON.ArcRotateCamera("cam1", 0, 0, 0, BABYLON.Vector3.Zero(), scene);
     camera.setPosition(new BABYLON.Vector3(0,1,-5.5));
     camera.attachControl(canvas, false);
+    camera.angularSensibilityX = 1000000;
+    camera.angularSensibilityY = 1000000;
     camera.lowerBetaLimit = 1.4;
-    camera.upperBetaLimit = 1.4;
+    camera.upperBetaLimit = 1.6;
     camera.lowerRadiusLimit = 5.5;
     camera.upperRadiusLimit = 5.5;
+    var spriteManagerClick = new BABYLON.SpriteManager("clickManager", 'Sprite/tapheretostart.png', 1, 512, scene);
     var spriteManagerAim = new BABYLON.SpriteManager("crosshairManager", 'Sprite/image0014.png', 1, 64, scene);
+    spriteManagerAim.isPickable = true;
     var crosshair = new BABYLON.Sprite("crosshair", spriteManagerAim);
+    crosshair.isPickable = true;
+    var click = new BABYLON.Sprite("click", spriteManagerClick);
+    click.size = 0.3;
 
     function setCrosshair()
     {
         var degf = model.rotation.y * 180 / Math.PI;
-        modelx = 0.05 * Math.sin((degf-15) * Math.PI / 180) * -1;
-        modelz = 0.05 * Math.cos((degf-15) * Math.PI / 180) * -1;
-//        crosshair.parent = model;
-//        crosshair.size = 0.6;
-        crosshair.position = model.position.add(new BABYLON.Vector3(modelx*100, 3, modelz*100));
+        var degv = camera.beta * 180 / Math.PI;
+        modelx = 0.75 * Math.sin((degf-90) * Math.PI / 180) * -1;
+        modelz = 0.75 * Math.cos((degf-90) * Math.PI / 180) * -1;
+        camy = 3.3 * Math.sin(degv * Math.PI / 180);
+        crosshair.position = model.position.add(new BABYLON.Vector3(modelx, camy, modelz));
+        if(!isStart)
+            click.position = model.position.add(new BABYLON.Vector3(modelx-0.075, camy-0.07, modelz-0.075));
     }
-//    CrossHairInFrontOfCamera(YourCrosshairVarNameHere, camera, 1000);
 
     var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,10,0), scene);
     light.density = 0.7;
@@ -44,20 +53,10 @@
     var matGround = new BABYLON.StandardMaterial('ground1',scene);
     matGround.diffuseTexture = new BABYLON.Texture('Texture/grass.jpg', scene);
     ground.material = matGround;
-
-    //camera.lockedTarget = head;
-    //camera.radius = 20; // how far from the object to follow
-    // camera.heightOffset = 7; // how high above the object to place the camera
-    // camera.rotationOffset = 180; // the viewing angle
-    // camera.cameraAcceleration = 0.05; // how fast to move
-    // camera.maxCameraSpeed = 20; // speed limit
-    // scene.activeCamera = camera;
-    /* Scene END */
-
-    /* Keyboard Event Start */
-    // Global Variable Jump
+    ground.isPickable = false;
 
     var model, globalSkele;
+    var d = BABYLON.MeshBuilder.CreateBox("box", {size: 3}, scene);
 
     BABYLON.SceneLoader.ImportMesh("", "Babylon/", "sora.babylon", scene, function(newMeshes, particleSystems, skeletons){
         model = newMeshes[0];
@@ -66,14 +65,12 @@
         scene.beginAnimation(globalSkele, 0, 0, false, 1.0);
         model.rotation.y = camera.alpha*-1 - alfa;
         camera.target = new BABYLON.Vector3(model.position.x, 3, model.position.z);
-//        var degf = model.rotation.y * 180 / Math.PI;
-//        modelx = 0.05 * Math.sin((degf-15) * Math.PI / 180) * -1;
-//        modelz = 0.05 * Math.cos((degf-15) * Math.PI / 180) * -1;
         crosshair.parent = model;
         crosshair.size = 0.6;
-//        crosshair.position = model.position.add(new BABYLON.Vector3(modelx*100, 3, modelz*100));
+        d.position = new BABYLON.Vector3(model.position.x, model.position.y+3, model.position.z+10);
         setCrosshair();
     });
+
 
     var animationState = false;
     function startAnimation() {
@@ -85,146 +82,86 @@
 
     var keyCode = {}, isShooting = false;
 
-    window.onkeydown = function(e){
+    window.onkeydown = function(e) {
         e = e || window.e;
-        keyCode[e.keyCode || e.which ] = true;
+        keyCode[e.keyCode || e.which] = true;
 
-//        var degf = model.rotation.y * 180 / Math.PI;
-//        modelx = 0.05 * Math.sin((degf-15) * Math.PI / 180) * -1;
-//        modelz = 0.05 * Math.cos((degf-15) * Math.PI / 180) * -1;
-//        crosshair.position = model.position.add(new BABYLON.Vector3(modelx*100, 3, modelz*100));
-        setCrosshair();
         var degf = model.rotation.y * 180 / Math.PI;
-        var degl = degf + Math.PI/2 * 180;
-        var modelx, modelz;
+        var degl = degf + Math.PI / 2 * 180;
+        var degw = degf + Math.PI / 4 * 180;
+        var modelxf = 0.05 * Math.sin(degf * Math.PI / 180) * -1;
+        var modelzf = 0.05 * Math.cos(degf * Math.PI / 180) * -1;
+        var modelxl = 0.05 * Math.sin(degl * Math.PI / 180) * -1;
+        var modelzl = 0.05 * Math.cos(degl * Math.PI / 180) * -1;
+        var modelxw = 0.05 * Math.sin(degw * Math.PI / 180) * -1;
+        var modelzw = 0.05 * Math.cos(degw * Math.PI / 180) * -1;
 
-        if(keyCode[65]){
-            console.log("left");
-            modelx = 0.05 * Math.sin(degl * Math.PI / 180) * -1;
-            modelz = 0.05 * Math.cos(degl * Math.PI / 180) * -1;
-            model.position = new BABYLON.Vector3(model.position.x+=modelx,0,model.position.z+=modelz);
-            startAnimation();
-        }
-        if(keyCode[87]){
-            console.log("up");
-            modelx = 0.05 * Math.sin(degf * Math.PI / 180) * -1;
-            modelz = 0.05 * Math.cos(degf * Math.PI / 180) * -1;
-            model.position = new BABYLON.Vector3(model.position.x+=modelx,0,model.position.z+=modelz);
-            startAnimation();
-        }
-        if(keyCode[83]){
-            console.log("down");
-            modelx = -0.05 * Math.sin(degf * Math.PI / 180) * -1;
-            modelz = -0.05 * Math.cos(degf * Math.PI / 180) * -1;
-            model.position = new BABYLON.Vector3(model.position.x+=modelx,0,model.position.z+=modelz);
-            startAnimation();
-        }
-        if(keyCode[68]){
-            console.log("right");
-            modelx = -0.05 * Math.sin(degl * Math.PI / 180) * -1;
-            modelz = -0.05 * Math.cos(degl * Math.PI / 180) * -1;
-            model.position = new BABYLON.Vector3(model.position.x+=modelx,0,model.position.z+=modelz);
-            startAnimation();
-        }
-        if(keyCode[67]){
-            if(engine.isPointerLock)
-                engine.isPointerLock = false;
-            else
-                engine.isPointerLock = true;
-        }
+        if (isStart) {
+            if ((keyCode[65] && keyCode[87]) || (keyCode[65] && keyCode[83]) || (keyCode[68] && keyCode[87]) || (keyCode[68] && keyCode[83])) {
 
-//        dummy.position = new BABYLON.Vector3(model.position.x, 3.5, model.position.z);
-//        dummy.position.add(0,3.5,0);
-        camera.target = new BABYLON.Vector3(model.position.x, 3, model.position.z);
+                if (keyCode[65] && keyCode[87]) {
+                    console.log("upleft");
+                    model.position = new BABYLON.Vector3(model.position.x -= modelxw, 0, model.position.z -= modelzw);
+                    //                startAnimation();
+                }
+                else if (keyCode[65] && keyCode[83]) {
+                    console.log("downleft");
+                    model.position = new BABYLON.Vector3(model.position.x -= modelxw, 0, model.position.z += modelzw);
+                    //                startAnimation();
+                }
+                else if (keyCode[68] && keyCode[87]) {
+                    console.log("upright");
+                    model.position = new BABYLON.Vector3(model.position.x += modelxw, 0, model.position.z -= modelzw);
+                    //                startAnimation();
+                }
+                else if (keyCode[68] && keyCode[83]) {
+                    console.log("downleft");
+                    model.position = new BABYLON.Vector3(model.position.x += modelxw, 0, model.position.z += modelzw);
+                    //                startAnimation();
+                }
+            }
+            else if (keyCode[65]) {
+                console.log("left");
+                model.position = new BABYLON.Vector3(model.position.x += modelxl, 0, model.position.z += modelzl);
+                startAnimation();
+            }
+            else if (keyCode[87]) {
+                console.log("up");
+                model.position = new BABYLON.Vector3(model.position.x += modelxf, 0, model.position.z += modelzf);
+                startAnimation();
+            }
+            else if (keyCode[83]) {
+                console.log("down");
+                model.position = new BABYLON.Vector3(model.position.x -= modelxf, 0, model.position.z -= modelzf);
+                startAnimation();
+            }
+            else if (keyCode[68]) {
+                console.log("right");
+                model.position = new BABYLON.Vector3(model.position.x -= modelxl, 0, model.position.z -= modelzl);
+                startAnimation();
+            }
+
+            if (keyCode[67]) {
+                document.exitPointerLock();
+                camera.angularSensibilityY = 1000000;
+                camera.angularSensibilityX = 1000000;
+                isStart = false;
+            }
+
+            camera.target = new BABYLON.Vector3(model.position.x, 3, model.position.z);
+            setCrosshair();
+        }
     }
-
         window.onkeyup = function(e){
             delete keyCode[e.keyCode];
-            if(!keyCode[65]&&!keyCode[87]&&!keyCode[83]&&!keyCode[68]) {
+//            if(!keyCode[65]&&!keyCode[87]&&!keyCode[83]&&!keyCode[68]) {
+            if((e.keyCode==65||e.keyCode==87||e.keyCode==83||e.keyCode==68)||(!keyCode[65]&&!keyCode[87]&&!keyCode[83]&&!keyCode[68])){
                 scene.stopAnimation(globalSkele);
                 scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
                 animationState = false;
             }
         }
 
-//    window.onkeydown = function(event){
-//        event = event || window.event;
-//        var keyCodeDown = event.which || event.keyCode;
-//
-//        switch(keyCodeDown) {
-//            // W
-//            case 87:
-//                forward = true;
-//                startAnimation();
-//                break;
-//
-//            // A
-//            case 65:
-//                left = true;
-//                startAnimation();
-//                break;
-//
-//            // S
-//            case 83:
-//                back = true;
-//                startAnimation();
-//                break;
-//
-//            // D
-//            case 68:
-//                right = true;
-//                startAnimation();
-//                break;
-//        }
-//    };
-//    var flagg = false;
-//
-//
-//    window.onkeyup = function(event) {
-//        event = event || window.event;
-//        var keyCodeUp = event.which || event.keyCode;
-//
-//        switch (keyCodeUp) {
-//            // W
-//            case 87:
-//                forward = false;
-//                scene.stopAnimation(globalSkele);
-//                scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
-//                animationState = false;
-//                break;
-//
-//            // A
-//            case 65:
-//                left = false;
-//                scene.stopAnimation(globalSkele);
-//                scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
-//                animationState = false;
-//                break;
-//
-//            // S
-//            case 83:
-//                back = false;
-//                scene.stopAnimation(globalSkele);
-//                scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
-//                animationState = false;
-//                break;
-//
-//            // D
-//            case 68:
-//                right = false;
-//                scene.stopAnimation(globalSkele);
-//                scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
-//                animationState = false;
-//                break;
-//
-//            default:
-//                animationState = false;
-//                break;
-//
-//        }
-//
-//    };
-    /* Keyboard Event End */
 
     var onPointerUp = function(){
         isShooting = false;
@@ -240,20 +177,51 @@
 
     });
 
+    var isStart = false;
+    canvas.addEventListener("click", function(){
+
+        if(isStart == false){
+            var pickResult = scene.pickSprite(scene.pointerX, scene.pointerY);
+            if(pickResult.hit) {
+//                console.log(scene.pointerX);
+//                console.log(scene.pointerY);
+                if(parseInt((scene.pointerX-4)/10) == 62 && parseInt(scene.pointerY/10) == 38) {
+                    canvas.requestPointerLock();
+                    isStart = true;
+                    camera.angularSensibilityY = 1000;
+                    camera.angularSensibilityX = 1000;
+                    click.position = model.position.add(new BABYLON.Vector3(modelx-0.075, camy-10, modelz-0.075));
+                }
+            }
+        }
+        else {
+            click = new BABYLON.Sprite("click", spriteManagerClick);
+            click.size = 0.3;
+            var pickResult = scene.pick(scene.pointerX, scene.pointerY);
+            if(pickResult.hit) {
+                pickResult.pickedMesh.dispose();
+                console.log("hit");
+            }
+            else
+                console.log("miss");
+        }
+
+        console.log(pickResult.pickedMesh.name);
+    });
+
     engine.runRenderLoop(function(){
 
-        if(isShooting)
+        if(isShooting) {
             console.log("shoot");
+        }
 
         if(camera.alpha!=alfa){
             model.rotation.y = camera.alpha*-1 - alfa;
-//            var degf = model.rotation.y * 180 / Math.PI;
-//            modelx = 0.05 * Math.sin((degf-15) * Math.PI / 180) * -1;
-//            modelz = 0.05 * Math.cos((degf-15) * Math.PI / 180) * -1;
-//            crosshair.position = model.position.add(new BABYLON.Vector3(modelx*100, 3, modelz*100));
             setCrosshair();
-            console.log(camera.alpha);
+
+            console.log(camera.angularSensibilityX);
         }
+
         scene.render();
     });
 
@@ -264,6 +232,7 @@
     scene.onDispose = function(){
         canvas.removeEventListener("pointerdown", onPointerDown);
         canvas.removeEventListener("pointerup", onPointerUp);
+        canvas.removeEventListener("mousemove");
     }
 </script>
 
