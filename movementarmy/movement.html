@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>WASD</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script src="../common/babylon.js"></script>
+	<script src="../common/hand-1.3.7.js"></script>
+	<script src="../common/babylonObjLoader.js"></script>
+	<script src="src/GUIManager.js"></script>
+	<script src="src/GUIGroup.js"></script>
+	<script src="src/GUIPanel.js"></script>
+	<script src="src/GUITexture.js"></script>
+	<script src="src/GUIText.js"></script>
+	<script src="src/GUITextfield.js"></script>
+	<script src="src/GUITextarea.js"></script>
+	<script src="src/GUISelect.js"></script>
+	<script src="src/GUIWindow.js"></script>
+	<script src="src/GUIButton.js"></script>
+	<script src="src/GUINativeColor.js"></script>
+	<script src="src/GUIColor.js"></script>
+	<script src="src/GUICheckbox.js"></script>
+	<script src="src/GUIFieldset.js"></script>
+	<script src="src/GUILabel.js"></script>
+	<script src="src/GUIRadio.js"></script>
+	<script src="src/GUISlider.js"></script>
+	<script src="src/GUIDialog.js"></script>
+	<script src="src/GUIProgress.js"></script>
+	<script src="src/GUIMeter.js"></script>
+	<script src="src/GUISpinner.js"></script>
+	<script src="src/draggableGUI.js"></script>
+</head>
+<body>
+	<canvas id="myCanvas"></canvas>
+    <script>
+		var hit = [];
+		var shot = [];
+        var canvas = document.getElementById("myCanvas");
+        var engine = new BABYLON.Engine(canvas, true);
+
+        var scene = new BABYLON.Scene(engine);
+
+        // var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(0, 15, -10), scene);
+
+
+        var camera = new BABYLON.ArcRotateCamera("cam1", 0, 0, 0, BABYLON.Vector3.Zero(), scene);
+		camera.setPosition(new BABYLON.Vector3(0,15,-10));
+		camera.attachControl(canvas, false);
+
+	    var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,10,0), scene);
+	    light.density = 0.7;
+
+		var css = "button{cursor:pointer;}";
+		CASTORGUI.GUIManager.convertPixelToPercent = true;
+        guisystem = new CASTORGUI.GUIManager(canvas, css, {themeRoot: "dist/", pixel: false});
+
+
+        var guiTextureLost_0 = new CASTORGUI.GUITexture("lost0", "HUD/grey.jpg", {w:50,h:50,x:10,y:10}, guisystem, null);
+        var guiTextureLost_25 = new CASTORGUI.GUITexture("lost25", "HUD/grey.jpg", {w:50,h:50,x:60,y:10}, guisystem, null);
+        var guiTextureLost_50 = new CASTORGUI.GUITexture("lost50", "HUD/grey.jpg", {w:50,h:50,x:110,y:10}, guisystem, null);
+        var guiTextureLost_75 = new CASTORGUI.GUITexture("lost75", "HUD/grey.jpg", {w:50,h:50,x:160,y:10}, guisystem, null);
+        var guiTextureLost_100 = new CASTORGUI.GUITexture("lost100", "HUD/grey.jpg", {w:50,h:50,x:210,y:10}, guisystem, null);
+
+
+        var guiTextureLife_0 = new CASTORGUI.GUITexture("life0", "HUD/red.jpg", {w:50,h:50,x:10,y:10}, guisystem, null);
+        var guiTextureLife_25 = new CASTORGUI.GUITexture("life25", "HUD/red.jpg", {w:50,h:50,x:60,y:10}, guisystem, null);
+        var guiTextureLife_50 = new CASTORGUI.GUITexture("life50", "HUD/red.jpg", {w:50,h:50,x:110,y:10}, guisystem, null);
+        var guiTextureLife_75 = new CASTORGUI.GUITexture("life75", "HUD/red.jpg", {w:50,h:50,x:160,y:10}, guisystem, null);
+        var guiTextureLife_100 = new CASTORGUI.GUITexture("life100", "HUD/red.jpg", {w:50,h:50,x:210,y:10}, guisystem, null);
+
+        var guiBullet_1 = new CASTORGUI.GUITexture("bullet1", "HUD/bullet.png", {w:10,h:50,x:60,y:80}, guisystem, null);
+        var guiBullet_2 = new CASTORGUI.GUITexture("bullet2", "HUD/bullet.png", {w:10,h:50,x:50,y:80}, guisystem, null);
+        var guiBullet_3 = new CASTORGUI.GUITexture("bullet3", "HUD/bullet.png", {w:10,h:50,x:40,y:80}, guisystem, null);
+        var guiBullet_4 = new CASTORGUI.GUITexture("bullet4", "HUD/bullet.png", {w:10,h:50,x:30,y:80}, guisystem, null);
+        var guiBullet_5 = new CASTORGUI.GUITexture("bullet5", "HUD/bullet.png", {w:10,h:50,x:20,y:80}, guisystem, null);
+        var guiBullet_6 = new CASTORGUI.GUITexture("bullet6", "HUD/bullet.png", {w:10,h:50,x:10,y:80}, guisystem, null);
+
+        guiBullet_1.name = "bullet1";
+        var groupBullet = new CASTORGUI.GUIGroup("groupBullet", null, guisystem);
+        groupBullet.add(guiBullet_1);
+        groupBullet.add(guiBullet_2);
+        groupBullet.add(guiBullet_3);
+        groupBullet.add(guiBullet_4);
+        groupBullet.add(guiBullet_5);
+        groupBullet.add(guiBullet_6);
+
+        var groupLife = new CASTORGUI.GUIGroup("groupLife", null, guisystem);
+        groupLife.add(guiTextureLife_0);
+        groupLife.add(guiTextureLife_25);
+        groupLife.add(guiTextureLife_50);
+        groupLife.add(guiTextureLife_75);
+        groupLife.add(guiTextureLife_100);
+
+        var groupLost = new CASTORGUI.GUIGroup("groupLost", null, guisystem);
+        groupLost.add(guiTextureLost_0);
+        groupLost.add(guiTextureLost_25);
+        groupLost.add(guiTextureLost_50);
+        groupLost.add(guiTextureLost_75);
+        groupLost.add(guiTextureLost_100);
+
+	    var ground = BABYLON.Mesh.CreateGround('ground1', 25,25,2, scene);
+	    var matGround = new BABYLON.StandardMaterial('ground1',scene);
+	    matGround.diffuseTexture = new BABYLON.Texture('Texture/grass.jpg', scene);
+        ground.material = matGround;
+
+        var item = BABYLON.Mesh.CreatePolyhedron ("body", {type: 13, size: 0.5}, scene);
+        item.position.y = 1;
+        item.position.x = 3;
+        item.position.z = 5;
+
+        var item2 = BABYLON.Mesh.CreatePolyhedron ("body", {type: 13, size: 0.5}, scene);
+        item2.position.y = 1;
+        item2.position.x = 2;
+        item2.position.z = 5;
+
+        var footstep = new BABYLON.Sound("footstep", "footstep.mp3", scene, null, {loop: true});
+        var gunshot = new BABYLON.Sound("gunshot", "gunshot.mp3", scene, null);
+        var reload = new BABYLON.Sound("reload", "reload.mp3", scene, null);
+        var wilhelm = new BABYLON.Sound("wilhelm", "wilhelm.mp3", scene, null);
+
+        //camera.lockedTarget = head;
+        //camera.radius = 20; // how far from the object to follow
+        // camera.heightOffset = 7; // how high above the object to place the camera
+        // camera.rotationOffset = 180; // the viewing angle
+        // camera.cameraAcceleration = 0.05; // how fast to move
+        // camera.maxCameraSpeed = 20; // speed limit
+        // scene.activeCamera = camera;
+        /* Scene END */
+
+        /* Keyboard Event Start */
+        // Global Variable Jump
+
+        var model, globalSkele;
+        BABYLON.SceneLoader.ImportMesh("", "Object/", "testing2.babylon", scene, function(newMeshes, particleSystems, skeletons){
+        	model = newMeshes[0];
+        	globalSkele = skeletons[0];
+        	model.position = new BABYLON.Vector3(0,0,0);
+            scene.beginAnimation(globalSkele, 0, 0, false, 1.0);
+        });
+
+        var animationState = false;
+        function startAnimation() {
+            if(!animationState){
+                animationState = true;
+                scene.beginAnimation(globalSkele, 1, 19, true, 1.0);
+                footstep.play();
+			}
+        };
+
+        function startGunshotAnimation(){
+
+            if(shot.length <= 5){
+            scene.beginAnimation(globalSkele, 20, 40, false, 1.0);
+            gunshot.play(0.3);
+            switch(shot.length) {
+                case 0:
+                    guiBullet_1.setVisible(false);
+                    shot.push(shot.length);
+                    break;
+                case 1:
+                    guiBullet_2.setVisible(false);
+                    shot.push(shot.length);
+                    break;
+                case 2:
+                    guiBullet_3.setVisible(false);
+                    shot.push(shot.length);
+                    break;
+                case 3:
+                    guiBullet_4.setVisible(false);
+                    shot.push(shot.length);
+                    break;
+                case 4:
+                    guiBullet_5.setVisible(false);
+                    shot.push(shot.length);
+                    break
+
+                case 5:
+                    guiBullet_6.setVisible(false);
+                    shot.push(shot.length);
+                    break;
+
+            }
+            }
+		};
+
+        function startReloadAnimation(){
+            scene.beginAnimation(globalSkele, 60, 84, false, 1.0);
+            reload.play(0.5);
+            shot = [];
+            guiBullet_1.setVisible(true);
+            guiBullet_2.setVisible(true);
+            guiBullet_3.setVisible(true);
+            guiBullet_4.setVisible(true);
+            guiBullet_5.setVisible(true);
+            guiBullet_6.setVisible(true);
+		};
+
+
+        function hitted(){
+            wilhelm.play(-0.5);
+            switch(hit.length)
+			{
+				case 0:
+				    guiTextureLife_100.setVisible(false);
+				    hit.push(hit.length);
+				    break;
+				case 1:
+				    guiTextureLife_75.setVisible(false);
+				    hit.push(hit.length);
+				    break;
+				case 2:
+				    guiTextureLife_50.setVisible(false);
+				    hit.push(hit.length);
+				    break;
+				case 3:
+				    guiTextureLife_25.setVisible(false);
+				    hit.push(hit.length);
+				    break;
+				case 4:
+				    guiTextureLife_0.setVisible(false);
+				    hit.push(hit.length);
+
+				    var form = new CASTORGUI.GUIWindow("form", {x:(guisystem.getCanvasSize().width / 2 - 100), y:200 , w:200, h:200, overflow: "hidden"}, guisystem);
+                    var optionsGUIText = {position: "relative", x: 10,y: 0, text: "Dead<br /><br />This supposed to be a very easy game<br /><br />You fucking noob <br />", color: "white", size: 12 };
+                    var textForWindow = new CASTORGUI.GUIText("textInfo", optionsGUIText, guisystem, false);
+                    form.add(textForWindow);
+                    form.setVisible(true);
+                    setTimeout(function(){location.reload();}, 3000);
+                    canvas.dispose();
+				    break;
+
+			}
+		}
+
+
+		item.actionManager = new BABYLON.ActionManager(scene);
+		item.actionManager.registerAction(new BABYLON.ExecuteCodeAction( { trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: item2}, function(){
+			hitted();
+		}));
+
+
+        var forward, back, left, right;
+        window.onkeydown = function(event){
+            event = event || window.event;
+            var keyCodeDown = event.which || event.keyCode;
+
+            switch(keyCodeDown) {
+                // W
+                case 87:
+                    forward = true;
+                    startAnimation();
+                    break;
+
+                // A
+                case 65:
+                    left = true;
+                    startAnimation();
+                    break;
+
+                // S
+                case 83:
+                    back = true;
+                    startAnimation();
+                    break;
+
+                // D
+                case 68:
+                    right = true;
+                    startAnimation();
+                    break;
+
+				// R
+				case 82:
+					startReloadAnimation();
+					break;
+
+				// Space
+				case 32:
+				    startGunshotAnimation();
+				    break;
+
+				case 66:
+				    hitted();
+				    break;
+            }
+
+
+        };
+
+        window.onkeyup = function(event) {
+            event = event || window.event;
+            var keyCodeUp = event.which || event.keyCode;
+
+            switch (keyCodeUp) {
+				// W
+
+                case 87:
+                    forward = false;
+                    scene.stopAnimation(globalSkele);
+                    scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
+                    animationState = false;
+                    footstep.stop(0);
+                    break;
+
+                // A
+                case 65:
+                    left = false;
+                    scene.stopAnimation(globalSkele);
+                    scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
+                    animationState = false;
+                    footstep.stop(0);
+                    break;
+
+                // S
+                case 83:
+                    back = false;
+                    scene.stopAnimation(globalSkele);
+                    scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
+                    animationState = false;
+                    footstep.stop(0);
+                    break;
+
+                // D
+                case 68:
+                    right = false;
+                    scene.stopAnimation(globalSkele);
+                    scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
+                    animationState = false;
+                    footstep.stop(0);
+                    break;
+
+            }
+        };
+        /* Keyboard Event End */
+
+        engine.runRenderLoop(function(){
+
+            if(forward == true && model.position.z <= 12){
+                model.position.z += 0.05;
+                model.rotation.y = Math.PI;
+            }
+            if(back == true && model.position.z >= -12){
+                model.position.z -= 0.05;
+                model.rotation.y = 0;
+            }
+            if(right == true && model.position.x <= 12){
+                model.position.x += 0.05;
+                model.rotation.y = -Math.PI/2;
+            }
+            if(left == true && model.position.x >= -12){
+                model.position.x -= 0.05;
+                model.rotation.y = Math.PI/2;
+            }
+            if(forward == true && left == true){
+            	model.rotation.y = ((Math.PI)+(Math.PI/2))/2;
+            }
+            if(forward == true && right == true){
+            	model.rotation.y = ((-Math.PI)+(-Math.PI/2))/2;
+            }
+            if(back == true && left == true){
+            	model.rotation.y = ((Math.PI)+(-Math.PI/2))/2;
+            }
+            if(back == true && right == true){
+            	model.rotation.y = ((-Math.PI)+(Math.PI/2))/2;
+            }
+
+           scene.render();
+        });
+
+        window.addEventListener('resize', function(){
+            engine.resize();
+        });
+    </script>
+
+</body>
+</html>
