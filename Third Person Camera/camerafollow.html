@@ -10,30 +10,41 @@
 <body>
 <canvas id="myCanvas"></canvas>
 <script>
-    var alfa = 4.71238898038469;
     var canvas = document.getElementById("myCanvas");
+    //defining pointer lock request function
     canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
     document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
+
     var engine = new BABYLON.Engine(canvas, true);
     var scene = new BABYLON.Scene(engine);
 
+    //setting up initial camera state
+    var alfa = 4.71238898038469; //the value of default alpha
     var camera = new BABYLON.ArcRotateCamera("cam1", 0, 0, 0, BABYLON.Vector3.Zero(), scene);
     camera.setPosition(new BABYLON.Vector3(0,1,-5.5));
     camera.attachControl(canvas, false);
-    camera.angularSensibilityX = 1000000;
-    camera.angularSensibilityY = 1000000;
+    camera.angularSensibilityX = 1000000; //locks camera alpha rotation
+    camera.angularSensibilityY = 1000000; //locks camera beta rotation
     camera.lowerBetaLimit = 1.4;
     camera.upperBetaLimit = 1.6;
     camera.lowerRadiusLimit = 5.5;
     camera.upperRadiusLimit = 5.5;
-    var spriteManagerClick = new BABYLON.SpriteManager("clickManager", 'Sprite/tapheretostart.png', 1, 512, scene);
+
+    //creating sprite managers for crosshair and click to start sprite
+    var spriteManagerClick = new BABYLON.SpriteManager("clickManager", 'Sprite/clicktostart.png', 1, 720, scene);
     var spriteManagerAim = new BABYLON.SpriteManager("crosshairManager", 'Sprite/image0014.png', 1, 64, scene);
     spriteManagerAim.isPickable = true;
-    var crosshair = new BABYLON.Sprite("crosshair", spriteManagerAim);
-    crosshair.isPickable = true;
-    var click = new BABYLON.Sprite("click", spriteManagerClick);
-    click.size = 0.3;
 
+    //defining a crosshair
+    var crosshair = new BABYLON.Sprite("crosshair", spriteManagerAim);
+    crosshair.size = 0.6;
+    crosshair.isPickable = true;
+
+    //defining click to start
+    var click = new BABYLON.Sprite("click", spriteManagerClick);
+    click.size = 0.5;
+
+    //defining function for crosshair placement
     function setCrosshair()
     {
         var degf = model.rotation.y * 180 / Math.PI;
@@ -43,7 +54,7 @@
         camy = 3.3 * Math.sin(degv * Math.PI / 180);
         crosshair.position = model.position.add(new BABYLON.Vector3(modelx, camy, modelz));
         if(!isStart)
-            click.position = model.position.add(new BABYLON.Vector3(modelx-0.075, camy-0.07, modelz-0.075));
+            click.position = model.position.add(new BABYLON.Vector3(modelx-0.06, camy-0.155, modelz-0.075)); //not correct yet
     }
 
     var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,10,0), scene);
@@ -63,10 +74,9 @@
         globalSkele = skeletons[0];
         model.position = new BABYLON.Vector3(0,0,0);
         scene.beginAnimation(globalSkele, 0, 0, false, 1.0);
-        model.rotation.y = camera.alpha*-1 - alfa;
+        model.rotation.y = camera.alpha*-1 - alfa; //to make model facing away from camera
+
         camera.target = new BABYLON.Vector3(model.position.x, 3, model.position.z);
-        crosshair.parent = model;
-        crosshair.size = 0.6;
         d.position = new BABYLON.Vector3(model.position.x, model.position.y+3, model.position.z+10);
         setCrosshair();
     });
@@ -80,12 +90,13 @@
         }
     };
 
-    var keyCode = {}, isShooting = false;
-
+    //defining user control
+    var keyCode = {};
     window.onkeydown = function(e) {
         e = e || window.e;
         keyCode[e.keyCode || e.which] = true;
 
+        //defining model rotation based on camera position
         var degf = model.rotation.y * 180 / Math.PI;
         var degl = degf + Math.PI / 2 * 180;
         var degw = degf + Math.PI / 4 * 180;
@@ -102,22 +113,18 @@
                 if (keyCode[65] && keyCode[87]) {
                     console.log("upleft");
                     model.position = new BABYLON.Vector3(model.position.x -= modelxw, 0, model.position.z -= modelzw);
-                    //                startAnimation();
                 }
                 else if (keyCode[65] && keyCode[83]) {
                     console.log("downleft");
                     model.position = new BABYLON.Vector3(model.position.x -= modelxw, 0, model.position.z += modelzw);
-                    //                startAnimation();
                 }
                 else if (keyCode[68] && keyCode[87]) {
                     console.log("upright");
                     model.position = new BABYLON.Vector3(model.position.x += modelxw, 0, model.position.z -= modelzw);
-                    //                startAnimation();
                 }
                 else if (keyCode[68] && keyCode[83]) {
                     console.log("downleft");
                     model.position = new BABYLON.Vector3(model.position.x += modelxw, 0, model.position.z += modelzw);
-                    //                startAnimation();
                 }
             }
             else if (keyCode[65]) {
@@ -154,7 +161,6 @@
     }
         window.onkeyup = function(e){
             delete keyCode[e.keyCode];
-//            if(!keyCode[65]&&!keyCode[87]&&!keyCode[83]&&!keyCode[68]) {
             if((e.keyCode==65||e.keyCode==87||e.keyCode==83||e.keyCode==68)||(!keyCode[65]&&!keyCode[87]&&!keyCode[83]&&!keyCode[68])){
                 scene.stopAnimation(globalSkele);
                 scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
@@ -162,41 +168,37 @@
             }
         }
 
-
+    //defining mouse click and unclick function
+    var isShooting = false;
     var onPointerUp = function(){
         isShooting = false;
     }
-
     var onPointerDown = function(){
         isShooting = true;
     }
 
     canvas.addEventListener("pointerdown", onPointerDown, false);
     canvas.addEventListener("pointerup", onPointerUp, false);
-    canvas.addEventListener("mousemove", function(){
-
-    });
 
     var isStart = false;
     canvas.addEventListener("click", function(){
 
         if(isStart == false){
+            //defining area for user to click to start
             var pickResult = scene.pickSprite(scene.pointerX, scene.pointerY);
             if(pickResult.hit) {
-//                console.log(scene.pointerX);
-//                console.log(scene.pointerY);
                 if(parseInt((scene.pointerX-4)/10) == 62 && parseInt(scene.pointerY/10) == 38) {
                     canvas.requestPointerLock();
                     isStart = true;
+                    //returning camera rotation to default
                     camera.angularSensibilityY = 1000;
                     camera.angularSensibilityX = 1000;
+                    //hides click to start
                     click.position = model.position.add(new BABYLON.Vector3(modelx-0.075, camy-10, modelz-0.075));
                 }
             }
         }
         else {
-            click = new BABYLON.Sprite("click", spriteManagerClick);
-            click.size = 0.3;
             var pickResult = scene.pick(scene.pointerX, scene.pointerY);
             if(pickResult.hit) {
                 pickResult.pickedMesh.dispose();
