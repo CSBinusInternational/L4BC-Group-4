@@ -6,6 +6,7 @@
 	<script src="../common/babylon.js"></script>
 	<script src="../common/hand-1.3.7.js"></script>
 	<script src="../common/babylonObjLoader.js"></script>
+	<script src="../common/babylon.custom.js"></script>
 	<script src="src/GUIManager.js"></script>
 	<script src="src/GUIGroup.js"></script>
 	<script src="src/GUIPanel.js"></script>
@@ -46,13 +47,50 @@
 		camera.setPosition(new BABYLON.Vector3(0,15,-10));
 		camera.attachControl(canvas, false);
 
-	    var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,10,0), scene);
+	    var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,20,0), scene);
 	    light.density = 0.7;
 
 		var css = "button{cursor:pointer;}";
 		CASTORGUI.GUIManager.convertPixelToPercent = true;
         guisystem = new CASTORGUI.GUIManager(canvas, css, {themeRoot: "dist/", pixel: false});
 
+        var canvas2d =  new BABYLON.ScreenSpaceCanvas2D(scene,{
+            id: "MenuCanvas",
+            size: new BABYLON.Size(guisystem.getCanvasSize().width, guisystem.getCanvasSize().height),
+            backgroundFill: "#000000FF",
+            children: [
+                new BABYLON.Text2D("Welcome to our Game", {
+                    id: "text",
+                    marginAlignment: "h: center, v: top",
+                    fontName: "90pt Arial",
+                    fontSuperSample : true,
+                })
+            ]
+
+        });
+
+        var buttonStart = new BABYLON.Rectangle2D({
+			parent: canvas2d,
+			id: "button",
+			x: guisystem.getCanvasSize().width/2,
+			y: guisystem.getCanvasSize().height/2,
+			width:200,
+			height:100,
+			fill: "#40C040FF",
+			roundRadius : 1,
+			children: [
+			    new BABYLON.Text2D("Start Game!", {
+			        id: "startText",
+			        fontName : "20pt Arial",
+					marginAlignment: "h:center, v:center",
+					fontSuperSample: true
+				})
+			]
+		});
+
+        buttonStart.pointerEventObservable.add(function(){
+            canvas2d.dispose();
+		}, BABYLON.PrimitivePointerInfo.PointerDown);
 
         var guiTextureLost_0 = new CASTORGUI.GUITexture("lost0", "HUD/grey.jpg", {w:50,h:50,x:10,y:10}, guisystem, null);
         var guiTextureLost_25 = new CASTORGUI.GUITexture("lost25", "HUD/grey.jpg", {w:50,h:50,x:60,y:10}, guisystem, null);
@@ -102,16 +140,6 @@
 	    matGround.diffuseTexture = new BABYLON.Texture('Texture/grass.jpg', scene);
         ground.material = matGround;
 
-        var item = BABYLON.Mesh.CreatePolyhedron ("body", {type: 13, size: 0.5}, scene);
-        item.position.y = 1;
-        item.position.x = 3;
-        item.position.z = 5;
-
-        var item2 = BABYLON.Mesh.CreatePolyhedron ("body", {type: 13, size: 0.5}, scene);
-        item2.position.y = 1;
-        item2.position.x = 2;
-        item2.position.z = 5;
-
         var footstep = new BABYLON.Sound("footstep", "footstep.mp3", scene, null, {loop: true});
         var gunshot = new BABYLON.Sound("gunshot", "gunshot.mp3", scene, null);
         var reload = new BABYLON.Sound("reload", "reload.mp3", scene, null);
@@ -129,13 +157,22 @@
         /* Keyboard Event Start */
         // Global Variable Jump
 
-        var model, globalSkele;
+        var model, globalSkele, model2;
         BABYLON.SceneLoader.ImportMesh("", "Object/", "testing2.babylon", scene, function(newMeshes, particleSystems, skeletons){
         	model = newMeshes[0];
         	globalSkele = skeletons[0];
         	model.position = new BABYLON.Vector3(0,0,0);
             scene.beginAnimation(globalSkele, 0, 0, false, 1.0);
         });
+
+        BABYLON.SceneLoader.ImportMesh("", "Object/House/", "house2.babylon", scene, function(newMeshes){
+            model2 = newMeshes[0];
+            model2.position = new BABYLON.Vector3(0,0,0);
+            var houseTexture = new BABYLON.StandardMaterial("houseTex", scene);
+            houseTexture.diffuseTexture = new BABYLON.Texture("Object/House/Farmhouse Texture.jpg", scene);
+            model2.material = houseTexture;
+            //model2.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+		});
 
         var animationState = false;
         function startAnimation() {
@@ -232,10 +269,7 @@
 		}
 
 
-		item.actionManager = new BABYLON.ActionManager(scene);
-		item.actionManager.registerAction(new BABYLON.ExecuteCodeAction( { trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: item2}, function(){
-			hitted();
-		}));
+
 
 
         var forward, back, left, right;
