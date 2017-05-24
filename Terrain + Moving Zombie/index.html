@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gangster Shooting</title>
+    <link rel="stylesheet" type="text/css" href="Common/style.css">
+    <script src="Common/babylon.js"></script>
+    <script src="Common/hand-1.3.7.js"></script>
+    <script src="Common/babylonObjLoader.js"></script>
+</head>
+<body>
+    <canvas id="myCanvas"></canvas>
+    <script>
+        var canvas = document.getElementById("myCanvas");
+        var engine = new BABYLON.Engine(canvas, true);
+        var scene = new BABYLON.Scene(engine);
+
+        var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 10, -15), scene);
+        camera.attachControl(canvas, true);
+
+        var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,100,0), scene);
+        light.density = 0.7;
+        light.specular = new BABYLON.Color3(0,0,0);
+
+        // SkyBox
+        var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", {size:1000.0}, scene);
+        var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+        skyboxMaterial.backFaceCulling = false;
+        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("Texture/sunnyDay", scene);
+        skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+        skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+        skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+        skybox.material = skyboxMaterial;
+        // End of SkyBox
+
+        // Terrain
+        BABYLON.SceneLoader.ImportMesh("","Object/Terrain/", "terrain2-texture.babylon", scene, function (newMeshes, particleSystems) {
+            var terrain = newMeshes[0];
+            terrain.position = new BABYLON.Vector3(0, 0, 0);
+            terrain.scaling = new BABYLON.Vector3(400, 400, 400);
+        });
+        // End of Terrain
+
+        // Rendering Scene
+        var time = 0;
+        var i = 1;
+        engine.runRenderLoop(function(){
+            // if(time % 30 == 0){
+            //     var box = BABYLON.MeshBuilder.CreateBox("box", {height: 5, faceColors: BABYLON.Color4(0.5, 0.4, 0.3, 1)}, scene);
+            //     // Randomize the X position for the enemy
+            //     var randomX = Math.floor(Math.random() * 200);
+            //     var minus = Math.floor(Math.random() * 2);
+            //     if(minus == 1)
+            //         randomX *= -1;
+
+            //     // Randomize the Z position for the enemy
+            //     if(randomX > -120 && randomX < 120){
+            //         var randomZ = Math.floor(Math.random() * 80) + 120;
+            //         var minus = Math.floor(Math.random() * 2);
+            //         if(minus == 1)
+            //             randomZ *= -1;
+            //     }
+            //     else{
+            //         var randomZ = Math.floor(Math.random() * 200);
+            //         var minus = Math.floor(Math.random() * 2);
+            //         if(minus == 1)
+            //             randomX *= -1;
+            //     }
+            //     box.position = new BABYLON.Vector3(randomX, 0, randomZ);
+            // }
+            
+            time++;
+
+            if(time % 360 == 0){
+
+                // To random the position of the zombie. 
+                // Whether at the north, south, east or west side of the terrain
+                // 1 = north, 2 = south, 3 = east, 4 = west
+                var position = Math.floor(Math.random()*4) + 1;
+
+                if(position == 1){
+                    // Import the zombie to the specified area on the north
+                    importMesh(position, i);
+                }
+                else if(position == 2){
+                    // Import the zombie to the specified area on the south
+                    importMesh(position, i);
+                }
+                else if(position == 3){
+                    // Import the zombie to the specified area on the east
+                    importMesh(position, i);
+                }
+                else{
+                    // Import the zombie to the specified area on the west
+                    importMesh(position, i);
+                }
+                i++;
+            }
+
+            for(var a=1; a<=i; a++){
+                var mesh = scene.getMeshByName("zombie"+a);
+                if(mesh){
+
+                    // if from the north area
+                    if(mesh.matchesTagsQuery("north"))
+                        mesh.position.z -= 0.05;
+
+                    // if from the south area
+                    else if(mesh.matchesTagsQuery("south"))
+                        mesh.position.z += 0.05;
+
+                    // if from the east area
+                    else if(mesh.matchesTagsQuery("east"))
+                        mesh.position.x -= 0.05;
+
+                    // if from the west area
+                    else if(mesh.matchesTagsQuery("west"))
+                        mesh.position.x += 0.05;
+                }    
+            }
+            scene.render();
+        });
+
+        window.addEventListener('resize', function(){
+            engine.resize();
+        });
+
+        function importMesh(position, i){
+            BABYLON.SceneLoader.ImportMesh("", "Object/Zombie/", "zombie.babylon", scene, function(newMeshes, particleSystems, skeletons){
+                var mesh = newMeshes[0];
+                var globalSkele = skeletons[0];
+
+                // Zombi respawn area (x, y, z)
+                // North : -10 -- 10, 0,  140 --  160
+                // South : -10 -- 10, 0, -160 -- -140
+                // East  :  120 -- 130, 0, -10 -- 10
+                // West  : -160 -- -150, 0, -10 -- 10
+
+                if(position == 1){
+                    mesh.position = new BABYLON.Vector3(Math.floor(Math.random() * 20) - 10, 0, Math.floor(Math.random() * 20) + 140);
+                    BABYLON.Tags.AddTagsTo(mesh, "north");
+                }
+                else if(position == 2){
+                    mesh.position = new BABYLON.Vector3(Math.floor(Math.random() * 20) - 10, 0, Math.floor(Math.random() * 20) - 160);
+                    BABYLON.Tags.AddTagsTo(mesh, "south");
+                    mesh.rotation = new BABYLON.Vector3(0, Math.PI, 0);
+                }
+                else if(position == 3){
+                    mesh.position = new BABYLON.Vector3(Math.floor(Math.random() * 10) + 120, 0, Math.floor(Math.random() * 20) - 10);
+                    BABYLON.Tags.AddTagsTo(mesh, "east");
+                    mesh.rotation = new BABYLON.Vector3(0, Math.PI/2, 0);
+                }
+                else{
+                    mesh.position = new BABYLON.Vector3(Math.floor(Math.random() * 10) - 160, 0, Math.floor(Math.random() * 20) - 10);
+                    BABYLON.Tags.AddTagsTo(mesh, "west");
+                    mesh.rotation = new BABYLON.Vector3(0, Math.PI/2 * 3, 0);
+                }
+
+                mesh.name = "zombie" + i;
+                scene.beginAnimation(globalSkele, 1, 60, true, 1.0);
+                
+                mesh.actionManager = new BABYLON.ActionManager(scene);
+                mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction( { trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: cube }, function(){
+                    console.log("FINALYY!");
+                    var b = BABYLON.Mesh.CreateBox("haha", 10, scene);
+                    b.material = new BABYLON.StandardMaterial("navMaterial", scene);
+                    b.material.diffuseColor = new BABYLON.Color3(0, 0, 1);
+                    b.position = new BABYLON.Vector3(10, 5, 0);
+                    setTimeout(removeMesh.bind(null, mesh), 1000);
+                }));
+            })}
+
+        function removeMesh(mesh){
+            mesh.dispose();
+        }
+
+    </script>
+</body>
+</html>
