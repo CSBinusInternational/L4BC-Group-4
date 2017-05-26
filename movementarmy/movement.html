@@ -3,10 +3,10 @@
 <head>
 	<title>WASD</title>
 	<link rel="stylesheet" type="text/css" href="style.css">
-	<script src="Common/babylon.js"></script>
-	<script src="Common/hand-1.3.7.js"></script>
-	<script src="Common/babylonObjLoader.js"></script>
-	<script src="Common/babylon.custom.js"></script>
+	<script src="../common/babylon.js"></script>
+	<script src="../common/hand-1.3.7.js"></script>
+	<script src="../common/babylonObjLoader.js"></script>
+	<script src="../common/babylon.custom.js"></script>
 	<script src="src/GUIManager.js"></script>
 	<script src="src/GUIGroup.js"></script>
 	<script src="src/GUIPanel.js"></script>
@@ -35,6 +35,8 @@
     <script>
 		var hit = [];
 		var shot = [];
+		var score = 0;
+		var scoreString = score.toString();
         var canvas = document.getElementById("myCanvas");
         var engine = new BABYLON.Engine(canvas, true);
 
@@ -69,28 +71,74 @@
 
         });
 
+
+//        var mainMenu = new BABYLON.WorldSpaceCanvas2D(scene, new BABYLON.Size(50, 50), {
+//            id: "mainmenu",
+//			parent: camera,
+//            worldPosition: new BABYLON.Vector3(0, 0, 0),
+//			worldRotation: BABYLON.Quaternion.RotationYawPitchRoll(0, 0, 0),
+//            enableInteraction: true,
+//            backgroundFill: "#C0C0C040",
+//            children: [
+//                new BABYLON.Text2D("Welcome to our Game", {
+//                    id: "text",
+//                    marginAlignment: "h: center, v: top",
+//                    fontName: "5pt Arial",
+//                    fontSuperSample : true,
+//                })
+//            ]
+//        });
         var buttonStart = new BABYLON.Rectangle2D({
 			parent: canvas2d,
 			id: "button",
-			x: guisystem.getCanvasSize().width/2,
-			y: guisystem.getCanvasSize().height/2,
-			width:200,
+//			x: 50,
+//			y: 100,
+			marginAlignment: "h:center, v:center",
+			width:300,
 			height:100,
 			fill: "#40C040FF",
-			roundRadius : 1,
+			roundRadius : 4,
 			children: [
 			    new BABYLON.Text2D("Start Game!", {
 			        id: "startText",
-			        fontName : "20pt Arial",
+			        fontName : "30pt Arial",
 					marginAlignment: "h:center, v:center",
 					fontSuperSample: true
 				})
 			]
 		});
 
-        buttonStart.pointerEventObservable.add(function(){
+        var help = new BABYLON.Rectangle2D({
+			parent: canvas2d,
+			id: "help",
+			marginAlignment: "h:center, v:bottom",
+			width:500,
+			height: 200,
+			fill: "#000000FF",
+			children: [
+			    new BABYLON.Text2D("HOW TO PLAY: \n" +
+					"1. Use WASD to move your character.\n" +
+					"2. Aim your crosshair at zombies, right click to shoot. You have 10 bullets.\n" +
+					"3. Once you ran out of bullets, an ammunition box will be spawned near your house. Use it to reload your bullets.\n" +
+					"4. Defend your house at all cost. Once 5 zombies raided the house, it will be game over. Gain score as high as possible!", {
+			        id: "helpText",
+					fontName: "12pt Arial",
+					marginAlignment: "h:center, v:center",
+					fontSuperSample: true
+				})
+			]
+		})
+
+        buttonStart.pointerEventObservable.add(function(d, s){
             canvas2d.dispose();
-		}, BABYLON.PrimitivePointerInfo.PointerDown);
+		}, BABYLON.PrimitivePointerInfo.PointerUp);
+
+
+        var dialog = new CASTORGUI.GUIDialog("dialog", {w: 70, h:30, x:guisystem.getCanvasSize().width - 60, y:0, overflow:"hidden"}, guisystem);
+        dialog.setVisible(true);
+        var scoreBoard = new CASTORGUI.GUIText("scoreBoard222", {size: 20, text: scoreString}, guisystem, false);
+		dialog.add(scoreBoard);
+
 
         var guiTextureLost_0 = new CASTORGUI.GUITexture("lost0", "HUD/grey.jpg", {w:50,h:50,x:10,y:10}, guisystem, null);
         var guiTextureLost_25 = new CASTORGUI.GUITexture("lost25", "HUD/grey.jpg", {w:50,h:50,x:60,y:10}, guisystem, null);
@@ -313,7 +361,9 @@
 				    break;
 
 				case 66:
-				    hitted();
+				    score += 50;
+				    scoreString = score.toString();
+				    scoreBoard.updateText(scoreString);
 				    break;
             }
 
