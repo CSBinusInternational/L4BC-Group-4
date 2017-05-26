@@ -41,7 +41,6 @@
 
     //defining click to start
     var click = new BABYLON.Sprite("click", spriteManagerClick);
-    click.size = 1;
 
     //defining function for crosshair placement
     function setCrosshair()
@@ -95,93 +94,46 @@
         }
     };
 
-    //defining user control
-    var keyCode = {};
-    window.onkeydown = function(e) {
-        e = e || window.e;
-        keyCode[e.keyCode || e.which] = true;
+    var keys={left:0,right:0,forward:0,back:0,pause:0};
+    window.addEventListener("keydown", handleKeyDown, false);
+    window.addEventListener("keyup", handleKeyUp, false);
+    function handleKeyDown(evt){
 
-        //defining model rotation based on camera position
-        var degf = model.rotation.y * 180 / Math.PI;
-        var degl = degf + Math.PI / 2 * 180;
-        var degw = degf + Math.PI / 4 * 180;
-        var modelxf = 0.05 * Math.sin(degf * Math.PI / 180) * -1;
-        var modelzf = 0.05 * Math.cos(degf * Math.PI / 180) * -1;
-        var modelxl = 0.05 * Math.sin(degl * Math.PI / 180) * -1;
-        var modelzl = 0.05 * Math.cos(degl * Math.PI / 180) * -1;
-        var modelxw = 0.05 * Math.sin(degw * Math.PI / 180) * -1;
-        var modelzw = 0.05 * Math.cos(degw * Math.PI / 180) * -1;
-
-        if (isStart) {
-
-            if (keyCode[65] && keyCode[87]) {
-                console.log("up");
-                console.log("left");
-                model.position = new BABYLON.Vector3(model.position.x -= modelxw, 0, model.position.z -= modelzw);
-            startAnimation();
-            }
-            else if (keyCode[65] && keyCode[83]) {
-                console.log("down");
-                console.log("left");
-                model.position = new BABYLON.Vector3(model.position.x -= modelxw, 0, model.position.z += modelzw);
-            startAnimation();
-            }
-            else if (keyCode[68] && keyCode[87]) {
-                console.log("up");
-                console.log("right");
-                model.position = new BABYLON.Vector3(model.position.x += modelxw, 0, model.position.z -= modelzw);
-            startAnimation();
-            }
-            else if (keyCode[68] && keyCode[83]) {
-                console.log("down");
-                console.log("right");
-                model.position = new BABYLON.Vector3(model.position.x += modelxw, 0, model.position.z += modelzw);
-            startAnimation();
-            }
-            else if (keyCode[65]) {
-                console.log("left");
-                model.position = new BABYLON.Vector3(model.position.x += modelxl, 0, model.position.z += modelzl);
-                startAnimation();
-            }
-            else if (keyCode[87]) {
-                console.log("up");
-                model.position = new BABYLON.Vector3(model.position.x += modelxf, 0, model.position.z += modelzf);
-                startAnimation();
-            }
-            else if (keyCode[83]) {
-                console.log("down");
-                model.position = new BABYLON.Vector3(model.position.x -= modelxf, 0, model.position.z -= modelzf);
-                startAnimation();
-            }
-            else if (keyCode[68]) {
-                console.log("right");
-                model.position = new BABYLON.Vector3(model.position.x -= modelxl, 0, model.position.z -= modelzl);
-                startAnimation();
-            }
-
-            if (keyCode[67]) {
-                document.exitPointerLock();
-                camera.upperBetaLimit = 1.4;
-                model.rotation.y = camera.alpha*-1 - alfa;
-                camera.angularSensibilityY = 1000000;
-                camera.angularSensibilityX = 1000000;
-                isStart = false;
-            }
-
-            camera.target = new BABYLON.Vector3(model.position.x, 3, model.position.z);
-            setCrosshair();
+        if (evt.keyCode==65){
+            keys.left=1;
+        }
+        if (evt.keyCode==68){
+            keys.right=1;
+        }
+        if (evt.keyCode==87){
+            keys.forward=1;
+        }
+        if (evt.keyCode==83){
+            keys.back=1;
+        }
+        if (evt.keyCode==67){
+            keys.pause=1;
         }
     }
-    
-    window.onkeyup = function(e){
-        delete keyCode[e.keyCode];
-        console.log("keyUp" + e.keyCode);
-        if(!keyCode[65]&&!keyCode[87]&&!keyCode[83]&&!keyCode[68]){
-            scene.stopAnimation(globalSkele);
-            scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
-            animationState = false;
+    function handleKeyUp(evt){
+        if (evt.keyCode==65){
+            keys.left=0;
+        }
+        if (evt.keyCode==68){
+            keys.right=0;
+        }
+        if (evt.keyCode==87){
+            keys.forward=0;
+        }
+        if (evt.keyCode==83){
+            keys.back=0;
+        }
+        if (evt.keyCode==67){
+            keys.pause=0;
         }
     }
+
+
 
     //defining mouse click and unclick function
     var isShooting = false;
@@ -202,15 +154,15 @@
             //defining area for user to click to start
             var pickResult = scene.pick(scene.pointerX, scene.pointerY);
             if(pickResult.hit && pickResult.pickedMesh.name=="torus") {
-                    canvas.requestPointerLock();
-                    camera.upperBetaLimit = 1.6;
-                    isStart = true;
-                    //returning camera rotation to default
-                    camera.angularSensibilityY = 1000;
-                    camera.angularSensibilityX = 1000;
-                    //hides click to start
-                    click.position = new BABYLON.Vector3(0,100,0);
-                    torus.position = new BABYLON.Vector3(0,100,0);
+                canvas.requestPointerLock();
+                camera.upperBetaLimit = 1.6;
+                isStart = true;
+                //returning camera rotation to default
+                camera.angularSensibilityY = 1000;
+                camera.angularSensibilityX = 1000;
+                //hides click to start
+                click.position = new BABYLON.Vector3(0,100,0);
+                torus.position = new BABYLON.Vector3(0,100,0);
             }
         }
         else {
@@ -227,6 +179,72 @@
     });
 
     engine.runRenderLoop(function(){
+
+        if(model && isStart) {
+            var degf = model.rotation.y * 180 / Math.PI;
+            var degl = degf + Math.PI / 2 * 180;
+            var degw = degf + Math.PI / 4 * 180;
+            var degv = degf - Math.PI / 4 * 180;
+            var modelxf = 0.05 * Math.sin(degf * Math.PI / 180) * -1;
+            var modelzf = 0.05 * Math.cos(degf * Math.PI / 180) * -1;
+            var modelxl = 0.05 * Math.sin(degl * Math.PI / 180) * -1;
+            var modelzl = 0.05 * Math.cos(degl * Math.PI / 180) * -1;
+            var modelxw = 0.05 * Math.sin(degw * Math.PI / 180) * -1;
+            var modelzw = 0.05 * Math.cos(degw * Math.PI / 180) * -1;
+            var modelxv = 0.05 * Math.sin(degv * Math.PI / 180) * -1;
+            var modelzv = 0.05 * Math.cos(degv * Math.PI / 180) * -1;
+
+            if (keys.left && keys.forward) {
+                model.position = new BABYLON.Vector3(model.position.x -= modelxw, 0, model.position.z -= modelzw);
+            }
+            else if(keys.left && keys.back) {
+                model.position = new BABYLON.Vector3(model.position.x += modelxv, 0, model.position.z += modelzv);
+            }
+            else if(keys.right && keys.forward) {
+                model.position = new BABYLON.Vector3(model.position.x -= modelxv, 0, model.position.z -= modelzv);
+            }
+            else if(keys.right && keys.back) {
+                model.position = new BABYLON.Vector3(model.position.x += modelxw, 0, model.position.z += modelzw);
+            }
+            else if (keys.left) {
+                model.position = new BABYLON.Vector3(model.position.x += modelxl, 0, model.position.z += modelzl);
+                startAnimation();
+            }
+            else if (keys.forward) {
+                model.position = new BABYLON.Vector3(model.position.x += modelxf, 0, model.position.z += modelzf);
+                startAnimation();
+            }
+            else if (keys.back) {
+                model.position = new BABYLON.Vector3(model.position.x -= modelxf, 0, model.position.z -= modelzf);
+                startAnimation();
+            }
+            else if (keys.right) {
+                model.position = new BABYLON.Vector3(model.position.x -= modelxl, 0, model.position.z -= modelzl);
+                startAnimation();
+            }
+
+            if(!keys.left&&!keys.right&&!keys.forward&&!keys.back) {
+                scene.stopAnimation(globalSkele);
+                scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
+                animationState = false;
+            }
+
+            if (keys.pause == 1) {
+                document.exitPointerLock();
+                camera.upperBetaLimit = 1.4;
+                model.rotation.y = camera.alpha * -1 - alfa;
+                camera.angularSensibilityY = 1000000;
+                camera.angularSensibilityX = 1000000;
+                isStart = false;
+
+                scene.stopAnimation(globalSkele);
+                scene.beginAnimation(globalSkele, scene.currentFrame, 0, false, 1.0);
+                animationState = false;
+            }
+
+            camera.target = new BABYLON.Vector3(model.position.x, 3, model.position.z);
+            setCrosshair();
+        }
 
         if(isShooting) {
             console.log("shoot");

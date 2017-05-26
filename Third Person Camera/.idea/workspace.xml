@@ -19,14 +19,32 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="camerafollow.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="camerafollow.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/camerafollow.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4032">
-              <caret line="195" column="61" lean-forward="false" selection-start-line="195" selection-start-column="61" selection-end-line="195" selection-end-column="61" />
-              <folding>
-                <marker date="1495736384216" expanded="true" signature="2076:2196" ph="..." />
-              </folding>
+            <state relative-caret-position="483">
+              <caret line="181" column="35" lean-forward="true" selection-start-line="179" selection-start-column="12" selection-end-line="181" selection-end-column="35" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="camerafollow.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../../../Blender/Third Person Camera/camerafollow.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="795">
+              <caret line="274" column="7" lean-forward="false" selection-start-line="274" selection-start-column="7" selection-end-line="274" selection-end-column="7" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../Blender/Third Person Camera/test.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="795">
+              <caret line="182" column="16" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="274" selection-end-column="7" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -34,8 +52,18 @@
       <file leaf-file-name="movemove.html" pinned="false" current-in-tab="false">
         <entry file="file://C:/xampp/htdocs/Week 3/movemove.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2940">
-              <caret line="140" column="8" lean-forward="false" selection-start-line="140" selection-start-column="8" selection-end-line="140" selection-end-column="8" />
+            <state relative-caret-position="207">
+              <caret line="147" column="36" lean-forward="true" selection-start-line="140" selection-start-column="8" selection-end-line="147" selection-end-column="36" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../Final Project/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="167">
+              <caret line="333" column="57" lean-forward="false" selection-start-line="333" selection-start-column="57" selection-end-line="333" selection-end-column="57" />
               <folding />
             </state>
           </provider>
@@ -63,10 +91,14 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>setcr</find>
-      <find>crosshair</find>
       <find>image</find>
       <find>box</find>
       <find>click.posi</find>
+      <find>model</find>
+      <find>setcrosshair</find>
+      <find>crosshair</find>
+      <find>69</find>
+      <find>68</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -79,6 +111,9 @@
         <option value="$PROJECT_DIR$/test" />
         <option value="$PROJECT_DIR$/test.html" />
         <option value="$PROJECT_DIR$/camerafollow.html" />
+        <option value="$PROJECT_DIR$/../Final Project/index.html" />
+        <option value="$PROJECT_DIR$/../../../Blender/Third Person Camera/test.html" />
+        <option value="$PROJECT_DIR$/../../../Blender/Third Person Camera/camerafollow.html" />
       </list>
     </option>
   </component>
@@ -114,6 +149,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -128,8 +165,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -252,11 +287,12 @@
       <workItem from="1495514611205" duration="869000" />
       <workItem from="1495646762363" duration="2671000" />
       <workItem from="1495708398317" duration="8537000" />
+      <workItem from="1495811958790" duration="2450000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="99424000" />
+    <option name="totallyTimeSpent" value="105794000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="0" width="1932" height="1038" extended-state="0" />
@@ -292,39 +328,11 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/style.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="13" column="23" lean-forward="false" selection-start-line="13" selection-start-column="23" selection-end-line="13" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/camerafollow.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1197">
-          <caret line="57" column="28" lean-forward="false" selection-start-line="57" selection-start-column="28" selection-end-line="57" selection-end-column="28" />
-          <folding>
-            <marker date="1495736384216" expanded="true" signature="2076:2196" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/style.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="13" column="23" lean-forward="false" selection-start-line="13" selection-start-column="23" selection-end-line="13" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/camerafollow.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1495736384216" expanded="true" signature="2076:2196" ph="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -336,110 +344,64 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html" />
     <entry file="file://$PROJECT_DIR$/index.html" />
     <entry file="file://$PROJECT_DIR$/movement.html" />
-    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html" />
     <entry file="file://$PROJECT_DIR$/test.html" />
     <entry file="file://$PROJECT_DIR$/camerafollow.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4725">
           <caret line="225" column="27" lean-forward="false" selection-start-line="225" selection-start-column="27" selection-end-line="225" selection-end-column="27" />
-          <folding>
-            <marker date="1495736384216" expanded="true" signature="2076:2196" ph="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html" />
     <entry file="file://$PROJECT_DIR$/movement.html" />
-    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html" />
     <entry file="file://$PROJECT_DIR$/test.html" />
     <entry file="file://$PROJECT_DIR$/camerafollow.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4725">
           <caret line="225" column="27" lean-forward="false" selection-start-line="225" selection-start-column="27" selection-end-line="225" selection-end-column="27" />
-          <folding>
-            <marker date="1495736384216" expanded="true" signature="2076:2196" ph="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html" />
     <entry file="file://$PROJECT_DIR$/movement.html" />
-    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html" />
     <entry file="file://$PROJECT_DIR$/test.html" />
     <entry file="file://$PROJECT_DIR$/camerafollow.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="441">
           <caret line="21" column="46" lean-forward="false" selection-start-line="21" selection-start-column="46" selection-end-line="21" selection-end-column="46" />
-          <folding>
-            <marker date="1495736384216" expanded="true" signature="2076:2196" ph="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html" />
     <entry file="file://$PROJECT_DIR$/movement.html" />
-    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html" />
     <entry file="file://$PROJECT_DIR$/test.html" />
     <entry file="file://$PROJECT_DIR$/camerafollow.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="441">
           <caret line="21" column="46" lean-forward="false" selection-start-line="21" selection-start-column="46" selection-end-line="21" selection-end-column="46" />
-          <folding>
-            <marker date="1495736384216" expanded="true" signature="2076:2196" ph="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html" />
     <entry file="file://$PROJECT_DIR$/movement.html" />
-    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html" />
     <entry file="file://$PROJECT_DIR$/test.html" />
     <entry file="file://$PROJECT_DIR$/camerafollow.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="441">
           <caret line="21" column="46" lean-forward="false" selection-start-line="21" selection-start-column="46" selection-end-line="21" selection-end-column="46" />
-          <folding>
-            <marker date="1495736384216" expanded="true" signature="2076:2196" ph="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -454,13 +416,7 @@
     <entry file="file://$PROJECT_DIR$/movement.html" />
     <entry file="file://$PROJECT_DIR$/index.html" />
     <entry file="file://$PROJECT_DIR$/movement.html" />
-    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../../Final Project Reference/Human - Move/MouseMove.html" />
     <entry file="file://$PROJECT_DIR$/style.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="273">
@@ -478,36 +434,45 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test.html" />
-    <entry file="file://$PROJECT_DIR$/../../../Web Programming/Vue/vue-webpack-gulp-package/src/index.html">
+    <entry file="file://$PROJECT_DIR$/../../../Web Programming/Vue/vue-webpack-gulp-package/src/index.html" />
+    <entry file="file://$PROJECT_DIR$/../../Final Project/L4BC-Group-4/Third Person Camera/camerafollow.html" />
+    <entry file="file://$PROJECT_DIR$/../Final Project/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/xampp/htdocs/Week 3/movemove.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2940">
-          <caret line="140" column="8" lean-forward="false" selection-start-line="140" selection-start-column="8" selection-end-line="140" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../Final Project/L4BC-Group-4/Third Person Camera/camerafollow.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="167">
+          <caret line="333" column="57" lean-forward="false" selection-start-line="333" selection-start-column="57" selection-end-line="333" selection-end-column="57" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/camerafollow.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4032">
-          <caret line="195" column="61" lean-forward="false" selection-start-line="195" selection-start-column="61" selection-end-line="195" selection-end-column="61" />
-          <folding>
-            <marker date="1495736384216" expanded="true" signature="2076:2196" ph="..." />
-          </folding>
+        <state relative-caret-position="483">
+          <caret line="181" column="35" lean-forward="true" selection-start-line="179" selection-start-column="12" selection-end-line="181" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/xampp/htdocs/Week 3/movemove.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="207">
+          <caret line="147" column="36" lean-forward="true" selection-start-line="140" selection-start-column="8" selection-end-line="147" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../Blender/Third Person Camera/test.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="795">
+          <caret line="182" column="16" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="274" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../Blender/Third Person Camera/camerafollow.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="795">
+          <caret line="274" column="7" lean-forward="false" selection-start-line="274" selection-start-column="7" selection-end-line="274" selection-end-column="7" />
+          <folding />
         </state>
       </provider>
     </entry>
