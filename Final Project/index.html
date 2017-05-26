@@ -7,6 +7,7 @@
     <script src="Common/babylon.js"></script>
     <script src="Common/hand-1.3.7.js"></script>
     <script src="Common/babylonObjLoader.js"></script>
+    <script src="Common/timer.js"></script>
     <script src="src/GUIManager.js"></script>
     <script src="src/GUIGroup.js"></script>
     <script src="src/GUIPanel.js"></script>
@@ -40,28 +41,33 @@
         // Defining pointer lock request function
         canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
         document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
-        // End of defining pointer lock request function
 
         // Sound effect
         var wilhelm = new BABYLON.Sound("wilhelm", "Soundtrack/wilhelm.mp3", scene, null);
-        // End of sound effect
+        var footstep = new BABYLON.Sound("footstep", "Soundtrack/footstep.mp3", scene, null, {loop: true});
+        var gunshot = new BABYLON.Sound("gunshot", "Soundtrack/gunshot.mp3", scene, null);
+        var reload = new BABYLON.Sound("reload", "Soundtrack/reload.mp3", scene, null);
+        var afod = new BABYLON.Sound("afod", "Soundtrack/afod1.mp3", scene, null);
+        var afod2 = new BABYLON.Sound("afod", "Soundtrack/afod2.mp3", scene, null, {loop:true});
 
         // Setting up initial camera state
-            var alfa = 4.71238898038469; //the value of default alpha
-            var camera = new BABYLON.ArcRotateCamera("cam1", 0, 0, 0, BABYLON.Vector3.Zero(), scene);
-            camera.setPosition(new BABYLON.Vector3(0,1,-5.5));
-            camera.attachControl(canvas, false);
-            camera.angularSensibilityX = 1000000; //locks camera alpha rotation
-            camera.angularSensibilityY = 1000000; //locks camera beta rotation
-            camera.lowerBetaLimit = 1.4;
-            camera.lowerRadiusLimit = 5.5;
-            camera.upperRadiusLimit = 5.5;
-        // End of setting up camera state
+        var alfa = 4.71238898038469; //the value of default alpha
+        var camera = new BABYLON.ArcRotateCamera("cam1", 0, 0, 0, BABYLON.Vector3.Zero(), scene);
+        camera.setPosition(new BABYLON.Vector3(0,1,-5.5));
+        camera.attachControl(canvas, false);
+        camera.angularSensibilityX = 1000000; //locks camera alpha rotation
+        camera.angularSensibilityY = 1000000; //locks camera beta rotation
+        camera.lowerBetaLimit = 1.4;
+        camera.upperBetaLimit = 1.6;
+        camera.lowerRadiusLimit = 5.5;
+        camera.upperRadiusLimit = 5.5;
         
+        // Preparing the usage of CASTORGUI Library
         var css = "button{cursor:pointer;}";
         CASTORGUI.GUIManager.convertPixelToPercent = true;
         guisystem = new CASTORGUI.GUIManager(canvas, css, {themeRoot: "dist/", pixel: false});
 
+        // Main Menu Screen
         var canvas2d =  new BABYLON.ScreenSpaceCanvas2D(scene,{
             id: "MenuCanvas",
             size: new BABYLON.Size(guisystem.getCanvasSize().width, guisystem.getCanvasSize().height),
@@ -77,55 +83,75 @@
 
         });
 
+        // Button to start game
         var buttonStart = new BABYLON.Rectangle2D({
             parent: canvas2d,
             id: "button",
-            x: guisystem.getCanvasSize().width/2,
-            y: guisystem.getCanvasSize().height/2,
-            width:200,
+            marginAlignment: "h:center, v:center",
+            width:300,
             height:100,
             fill: "#40C040FF",
-            roundRadius : 1,
+            roundRadius : 4,
             children: [
                 new BABYLON.Text2D("Start Game!", {
                     id: "startText",
-                    fontName : "20pt Arial",
+                    fontName : "30pt Arial",
                     marginAlignment: "h:center, v:center",
                     fontSuperSample: true
                 })
             ]
         });
 
+        // How to play text
+        var help = new BABYLON.Rectangle2D({
+            parent: canvas2d,
+            id: "help",
+            marginAlignment: "h:center, v:bottom",
+            width:500,
+            height: 200,
+            fill: "#000000FF",
+            children: [
+                new BABYLON.Text2D("HOW TO PLAY: \n" +
+                    "1. Use WASD to move your character and C to pause the game.\n" +
+                    "2. Aim your crosshair at zombies, left click to shoot. You have 10 bullets.\n" +
+                    "3. Once you ran out of bullets, an ammunition box will be spawned near your house. Use it to reload your bullets.\n" +
+                    "4. Defend your house at all cost. Once 5 zombies raided the house, it will be game over. Gain score as high as possible!", {
+                    id: "helpText",
+                    fontName: "12pt Arial",
+                    marginAlignment: "h:center, v:center",
+                    fontSuperSample: true
+                })
+            ]
+        })
+
+        // To make the start game button click-able
         buttonStart.pointerEventObservable.add(function(){
             canvas2d.dispose();
+            bgmMusic();
+            startUpGame();
         }, BABYLON.PrimitivePointerInfo.PointerDown);
 
         // Creating sprite managers for crosshair and click to start sprite
         var spriteManagerClick = new BABYLON.SpriteManager("clickManager", 'Object/Sprite/clicktostart2.png', 1, 1440, scene);
         var spriteManagerAim = new BABYLON.SpriteManager("crosshairManager", 'Object/Sprite/image0014.png', 1, 64, scene);
         spriteManagerAim.isPickable = true;
-        // End of creating sprite managers
 
         // Defining a crosshair
         var crosshair = new BABYLON.Sprite("crosshair", spriteManagerAim);
         crosshair.size = 0.6;
         crosshair.isPickable = true;
-        // End of defining a crosshair
 
         // Defining the center of the crosshair
         var torus = BABYLON.MeshBuilder.CreateTorus("torus", {diameter: 0.01, thickness: 0.05}, scene);
         torus.rotation.x = Math.PI/2;
-        // End of defining center of the crosshair
 
         // Defining click to start
         var click = new BABYLON.Sprite("click", spriteManagerClick);
-        // End of defining click to start
 
         // Lighting
         var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,100,0), scene);
         light.density = 0.7;
         light.specular = new BABYLON.Color3(0,0,0);
-        // End of Lighting
 
         // SkyBox
         var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", {size:1000.0}, scene);
@@ -136,7 +162,6 @@
         skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
         skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
         skybox.material = skyboxMaterial;
-        // End of SkyBox
 
         // Terrain
         BABYLON.SceneLoader.ImportMesh("","Object/Terrain/", "terrain2-texture.babylon", scene, function (newMeshes, particleSystems) {
@@ -144,21 +169,19 @@
             terrain.position = new BABYLON.Vector3(0, 0, 0);
             terrain.scaling = new BABYLON.Vector3(400, 400, 400);
         });
-        // End of Terrain
 
         // Player
         var player, playerSkeleton;
-        BABYLON.SceneLoader.ImportMesh("", "Object/Player/", "sora.babylon", scene, function(newMeshes, particleSystems, skeletons){
+        BABYLON.SceneLoader.ImportMesh("", "Object/Player/", "army.babylon", scene, function(newMeshes, particleSystems, skeletons){
             player = newMeshes[0];
             playerSkeleton = skeletons[0];
             player.position = new BABYLON.Vector3(-25,0,0);
             scene.beginAnimation(playerSkeleton, 0, 0, false, 1.0);
             player.rotation.y = camera.alpha*-1 - alfa; //to make player facing away from camera
-
+            player.scaling = new BABYLON.Vector3(1.2, 1.2, 1.2);
             camera.target = new BABYLON.Vector3(player.position.x, 3, player.position.z);
             setCrosshair();
         });
-        // End of Player
 
         // House
         var house;
@@ -171,157 +194,29 @@
             house.scaling = new BABYLON.Vector3(0.7, 0.7, 0.7);
             house.rotation.y = Math.PI/2;
         });
-        // End of House
 
-        // Health Bar
-        var guiTextureLost_0 = new CASTORGUI.GUITexture("lost0", "Object/HUD/grey.jpg", {w:50,h:50,x:10,y:10}, guisystem, null);
-        var guiTextureLost_25 = new CASTORGUI.GUITexture("lost25", "Object/HUD/grey.jpg", {w:50,h:50,x:60,y:10}, guisystem, null);
-        var guiTextureLost_50 = new CASTORGUI.GUITexture("lost50", "Object/HUD/grey.jpg", {w:50,h:50,x:110,y:10}, guisystem, null);
-        var guiTextureLost_75 = new CASTORGUI.GUITexture("lost75", "Object/HUD/grey.jpg", {w:50,h:50,x:160,y:10}, guisystem, null);
-        var guiTextureLost_100 = new CASTORGUI.GUITexture("lost100", "Object/HUD/grey.jpg", {w:50,h:50,x:210,y:10}, guisystem, null);
-
-        var guiTextureLife_0 = new CASTORGUI.GUITexture("life0", "Object/HUD/red.jpg", {w:50,h:50,x:10,y:10}, guisystem, null);
-        var guiTextureLife_25 = new CASTORGUI.GUITexture("life25", "Object/HUD/red.jpg", {w:50,h:50,x:60,y:10}, guisystem, null);
-        var guiTextureLife_50 = new CASTORGUI.GUITexture("life50", "Object/HUD/red.jpg", {w:50,h:50,x:110,y:10}, guisystem, null);
-        var guiTextureLife_75 = new CASTORGUI.GUITexture("life75", "Object/HUD/red.jpg", {w:50,h:50,x:160,y:10}, guisystem, null);
-        var guiTextureLife_100 = new CASTORGUI.GUITexture("life100", "Object/HUD/red.jpg", {w:50,h:50,x:210,y:10}, guisystem, null);
-
-        var groupLife = new CASTORGUI.GUIGroup("groupLife", null, guisystem);
-        groupLife.add(guiTextureLife_0);
-        groupLife.add(guiTextureLife_25);
-        groupLife.add(guiTextureLife_50);
-        groupLife.add(guiTextureLife_75);
-        groupLife.add(guiTextureLife_100);
-
-        var groupLost = new CASTORGUI.GUIGroup("groupLost", null, guisystem);
-        groupLost.add(guiTextureLost_0);
-        groupLost.add(guiTextureLost_25);
-        groupLost.add(guiTextureLost_50);
-        groupLost.add(guiTextureLost_75);
-        groupLost.add(guiTextureLost_100);
-        // End of Health bar
-
-        // Total Bullets
-
-
-        // End of Total Bullets
-        
         // Key Event
         // To set when the animation of the player should play
         var animationState = false;
         function startAnimation() {
             if(!animationState){
                 animationState = true;
-                scene.beginAnimation(playerSkeleton, 1, 20, true, 1.0);
+                scene.beginAnimation(playerSkeleton, 1, 19, true, 1.0);
+                footstep.play();
             }
         };
 
         // Defining user control of keyboard
-        var keyCode = {};
-        window.onkeydown = function(e) {
-            e = e || window.e;
-            keyCode[e.keyCode || e.which] = true;
-
-            // Defining player rotation based on camera position
-            var degf = player.rotation.y * 180 / Math.PI;
-            var degl = degf + Math.PI / 2 * 180;
-            var degw = degf + Math.PI / 4 * 180;
-            var degv = degf - Math.PI / 4 * 180;
-            var speed = 0.2;
-            var playerxf = speed * Math.sin(degf * Math.PI / 180) * -1;
-            var playerzf = speed * Math.cos(degf * Math.PI / 180) * -1;
-            var playerxl = speed * Math.sin(degl * Math.PI / 180) * -1;
-            var playerzl = speed * Math.cos(degl * Math.PI / 180) * -1;
-            var playerxw = speed * Math.sin(degw * Math.PI / 180) * -1;
-            var playerzw = speed * Math.cos(degw * Math.PI / 180) * -1;
-            var playerxv = speed * Math.sin(degv * Math.PI / 180) * -1;
-            var playerzv = speed * Math.cos(degv * Math.PI / 180) * -1;
-
-            if (isStart) {
-                if ((keyCode[65] && keyCode[87]) || (keyCode[65] && keyCode[83]) || (keyCode[68] && keyCode[87]) || (keyCode[68] && keyCode[83])) {
-
-                    if (keyCode[65] && keyCode[87]) {
-                        console.log("upleft");
-                        player.position = new BABYLON.Vector3(player.position.x -= playerxw, 0, player.position.z -= playerzw);
-                        startAnimation();
-                    }
-                    else if (keyCode[65] && keyCode[83]) {
-                        console.log("downleft");
-                        player.position = new BABYLON.Vector3(player.position.x += playerxv, 0, player.position.z += playerzv);
-                        startAnimation();
-                    }
-                    else if (keyCode[68] && keyCode[87]) {
-                        console.log("upright");
-                        player.position = new BABYLON.Vector3(player.position.x -= playerxv, 0, player.position.z -= playerzv);
-                        startAnimation();
-                    }
-                    else if (keyCode[68] && keyCode[83]) {
-                        console.log("downright");
-                        player.position = new BABYLON.Vector3(player.position.x += playerxw, 0, player.position.z += playerzw);
-                        startAnimation();
-                    }
-                }
-                else if (keyCode[65]) {
-                    console.log("left");
-                    player.position = new BABYLON.Vector3(player.position.x += playerxl, 0, player.position.z += playerzl);
-                    startAnimation();
-                }
-                else if (keyCode[87]) {
-                    console.log("up");
-                    player.position = new BABYLON.Vector3(player.position.x += playerxf, 0, player.position.z += playerzf);
-                    startAnimation();
-                }
-                else if (keyCode[83]) {
-                    console.log("down");
-                    player.position = new BABYLON.Vector3(player.position.x -= playerxf, 0, player.position.z -= playerzf);
-                    startAnimation();
-                }
-                else if (keyCode[68]) {
-                    console.log("right");
-                    player.position = new BABYLON.Vector3(player.position.x -= playerxl, 0, player.position.z -= playerzl);
-                    startAnimation();
-                }
-
-                if (keyCode[67]) {
-                    document.exitPointerLock();
-                    camera.angularSensibilityY = 1000000;
-                    camera.angularSensibilityX = 1000000;
-                    camera.upperBetaLimit = 1.4;
-                    player.rotation.y = camera.alpha*-1 - alfa;
-                    isStart = false;
-                }
-
-                camera.target = new BABYLON.Vector3(player.position.x, 3, player.position.z);
-                setCrosshair();
-            }
-        }
-        
-        window.onkeyup = function(e){
-            delete keyCode[e.keyCode];
-            if(!keyCode[65]&&!keyCode[87]&&!keyCode[83]&&!keyCode[68]){
-                scene.stopAnimation(playerSkeleton);
-                scene.beginAnimation(playerSkeleton, scene.currentFrame, 0, false, 1.0);
-                animationState = false;
-            }
-        }
+        var keys={left:0,right:0,forward:0,back:0,pause:0};
+        window.addEventListener("keydown", handleKeyDown, false);
+        window.addEventListener("keyup", handleKeyUp, false);
 
         // Defining user input from mouse
         // Defining mouse click and unclick function
         var isShooting = false;
-        var onPointerUp = function(){
-            isShooting = false;
-        }
-
-        var onPointerDown = function(){
-            isShooting = true;
-        }
-
-        canvas.addEventListener("pointerdown", onPointerDown, false);
-        canvas.addEventListener("pointerup", onPointerUp, false);
 
         var isStart = false;
         canvas.addEventListener("click", function(){
-
             if(isStart == false){
                 //defining area for user to click to start
                 var pickResult = scene.pick(scene.pointerX, scene.pointerY);
@@ -331,8 +226,8 @@
                         isStart = true;
 
                         //returning camera rotation to default
-                        camera.angularSensibilityY = 5000;
-                        camera.angularSensibilityX = 5000;
+                        camera.angularSensibilityY = 2000;
+                        camera.angularSensibilityX = 2000;
 
                         //hides click to start
                         click.position = new BABYLON.Vector3(0,100,0);
@@ -340,81 +235,189 @@
                 }
             }
             else {
+                // Manage the shooting process
+                isShooting = true;
+                t.start();
+
+                if(keys.left||keys.right||keys.forward||keys.back)
+                    startGunshotWalkingAnimation();
+                else
+                    startGunshotAnimation();
+
+                if(keys.forward)
                 var pickResult = scene.pick(scene.pointerX, scene.pointerY);
                 if(pickResult.hit) {
                     var meshName = pickResult.pickedMesh.name;
                     if(meshName.includes("zombie")){
-                        pickResult.pickedMesh.dispose();
-                        console.log("hit");
+                        if(ammo > 0){
+                            pickResult.pickedMesh.dispose();
+                            score += 50;
+                            scoreString = score.toString();
+                            scoreBoard.updateText(scoreString);
+                        }
                     }
                 }
-                else
-                    console.log("miss");
             }
         });
-        // End of key event
+
+        // To increase the duration of the shooting and reloading animation
+        var t = new Timer(800, scene, function(){
+            if(isShooting || isReloading) {
+                isShooting = false;
+                scene.stopAnimation(playerSkeleton);
+                scene.beginAnimation(playerSkeleton, scene.currentFrame, 0, false, 1.0);
+                animationState = false;
+                footstep.stop(0);
+            }
+
+            t.reset();
+        });
 
         // Rendering Scene
-        var time = 0, health = 4;
+        var time = 0;
         var i = 1;
+        var ammoBox, health, ammo;
         engine.runRenderLoop(function(){
+            if(isStart){
+                // To generate the zombie for every 4 seconds
+                if(time % 240 == 0){
 
-            // To generate the zombie for every 4 seconds
-            if(time % 360 == 0){
+                    // To random the position of the zombie. 
+                    // Whether at the north, south, east or west side of the terrain
+                    // 1 = north, 2 = south, 3 = east, 4 = west
+                    var position = Math.floor(Math.random()*4) + 1;
 
-                // To random the position of the zombie. 
-                // Whether at the north, south, east or west side of the terrain
-                // 1 = north, 2 = south, 3 = east, 4 = west
-                var position = Math.floor(Math.random()*4) + 1;
+                    if(position == 1){
+                        // Import the zombie to the specified area on the north
+                        importZombie(position, i);
+                    }
+                    else if(position == 2){
+                        // Import the zombie to the specified area on the south
+                        importZombie(position, i);
+                    }
+                    else if(position == 3){
+                        // Import the zombie to the specified area on the east
+                        importZombie(position, i);
+                    }
+                    else{
+                        // Import the zombie to the specified area on the west
+                        importZombie(position, i);
+                    }
+                    i++;
+                }
 
-                if(position == 1){
-                    // Import the zombie to the specified area on the north
-                    importZombie(position, i);
+                // To move the zombie based on their position
+                for(var a=1; a<=i; a++){
+                    var zombie = scene.getMeshByName("zombie"+a);
+                    if(zombie){
+
+                        // if from the north area
+                        if(zombie.matchesTagsQuery("north"))
+                            zombie.position.z -= 0.05;
+
+                        // if from the south area
+                        else if(zombie.matchesTagsQuery("south"))
+                            zombie.position.z += 0.05;
+
+                        // if from the east area
+                        else if(zombie.matchesTagsQuery("east"))
+                            zombie.position.x -= 0.05;
+
+                        // if from the west area
+                        else if(zombie.matchesTagsQuery("west"))
+                            zombie.position.x += 0.05;
+                    }    
                 }
-                else if(position == 2){
-                    // Import the zombie to the specified area on the south
-                    importZombie(position, i);
+                time++;
+
+                if(camera.alpha!=alfa){
+                    player.rotation.y = camera.alpha*-1 - alfa;
+                    setCrosshair();
                 }
-                else if(position == 3){
-                    // Import the zombie to the specified area on the east
-                    importZombie(position, i);
+
+                // if the player is running out of ammo, spawn the ammunition box
+                if(ammo == 0 && ammoBoxSpawned == false)
+                    generateAmmo();
+
+                // Rotating ammunition box
+                if(ammoBoxSpawned == true && ammoBox)
+                    ammoBox.rotation.y += 0.1;
+
+                // Manage user movement
+                if(player) {
+                    var speed = 0.2;
+                    var degf = player.rotation.y * 180 / Math.PI;
+                    var degl = degf + Math.PI / 2 * 180;
+                    var degw = degf + Math.PI / 4 * 180;
+                    var degv = degf - Math.PI / 4 * 180;
+                    var playerxf = speed * Math.sin(degf * Math.PI / 180) * -1;
+                    var playerzf = speed * Math.cos(degf * Math.PI / 180) * -1;
+                    var playerxl = speed * Math.sin(degl * Math.PI / 180) * -1;
+                    var playerzl = speed * Math.cos(degl * Math.PI / 180) * -1;
+                    var playerxw = speed * Math.sin(degw * Math.PI / 180) * -1;
+                    var playerzw = speed * Math.cos(degw * Math.PI / 180) * -1;
+                    var playerxv = speed * Math.sin(degv * Math.PI / 180) * -1;
+                    var playerzv = speed * Math.cos(degv * Math.PI / 180) * -1;
+
+                    if (keys.left && keys.forward) {
+                        player.position = new BABYLON.Vector3(player.position.x -= playerxw, 0, player.position.z -= playerzw);
+                        startAnimation();
+                    }
+                    else if(keys.left && keys.back) {
+                        player.position = new BABYLON.Vector3(player.position.x += playerxv, 0, player.position.z += playerzv);
+                        startAnimation();
+                    }
+                    else if(keys.right && keys.forward) {
+                        player.position = new BABYLON.Vector3(player.position.x -= playerxv, 0, player.position.z -= playerzv);
+                        startAnimation();
+                    }
+                    else if(keys.right && keys.back) {
+                        player.position = new BABYLON.Vector3(player.position.x += playerxw, 0, player.position.z += playerzw);
+                        startAnimation();
+                    }
+                    else if (keys.left) {
+                        player.position = new BABYLON.Vector3(player.position.x += playerxl, 0, player.position.z += playerzl);
+                        startAnimation();
+                    }
+                    else if (keys.forward) {
+                        player.position = new BABYLON.Vector3(player.position.x += playerxf, 0, player.position.z += playerzf);
+                        startAnimation();
+                    }
+                    else if (keys.back) {
+                        player.position = new BABYLON.Vector3(player.position.x -= playerxf, 0, player.position.z -= playerzf);
+                        startAnimation();
+                    }
+                    else if (keys.right) {
+                        player.position = new BABYLON.Vector3(player.position.x -= playerxl, 0, player.position.z -= playerzl);
+                        startAnimation();
+                    }
+
+                    if(!keys.left&&!keys.right&&!keys.forward&&!keys.back&&!isShooting) {  
+                        scene.stopAnimation(playerSkeleton);
+                        scene.beginAnimation(playerSkeleton, scene.currentFrame, 0, false, 1.0);
+                        animationState = false;
+                        footstep.stop(0);
+                    }
+
+                    // If the user press the "C" button, to pause the game
+                    if (keys.pause) {
+                        document.exitPointerLock();
+                        camera.upperBetaLimit = 1.4;
+                        player.rotation.y = camera.alpha * -1 - alfa;
+                        camera.angularSensibilityY = 1000000;
+                        camera.angularSensibilityX = 1000000;
+                        isStart = false;
+
+                        scene.stopAnimation(playerSkeleton);
+                        scene.beginAnimation(playerSkeleton, scene.currentFrame, 0, false, 1.0);
+                        animationState = false;
+                    }
+
+                    camera.target = new BABYLON.Vector3(player.position.x, 3, player.position.z);
+                    setCrosshair();
                 }
-                else{
-                    // Import the zombie to the specified area on the west
-                    importZombie(position, i);
-                }
-                i++;
             }
-
-            // To move the zombie based on their position
-            for(var a=1; a<=i; a++){
-                var zombie = scene.getMeshByName("zombie"+a);
-                if(zombie){
-
-                    // if from the north area
-                    if(zombie.matchesTagsQuery("north"))
-                        zombie.position.z -= 0.05;
-
-                    // if from the south area
-                    else if(zombie.matchesTagsQuery("south"))
-                        zombie.position.z += 0.05;
-
-                    // if from the east area
-                    else if(zombie.matchesTagsQuery("east"))
-                        zombie.position.x -= 0.05;
-
-                    // if from the west area
-                    else if(zombie.matchesTagsQuery("west"))
-                        zombie.position.x += 0.05;
-                }    
-            }
-            time++;
-
-            if(camera.alpha!=alfa){
-                player.rotation.y = camera.alpha*-1 - alfa;
-                setCrosshair();
-            }
-
+            
             scene.render();
         });
 
@@ -479,7 +482,7 @@
 
         // Removing health bar
         function hitted(){
-            wilhelm.play(-0.5);
+            wilhelm.play(0.2);
             switch(health)
             {
                 case 4:
@@ -498,11 +501,11 @@
                     guiTextureLife_0.setVisible(false);
 
                     var form = new CASTORGUI.GUIWindow("form", {x:(guisystem.getCanvasSize().width / 2 - 100), y:200 , w:200, h:200, overflow: "hidden"}, guisystem);
-                    var optionsGUIText = {position: "relative", x: 10,y: 0, text: "Dead<br /><br />This supposed to be a very easy game<br /><br />You fucking noob <br />", color: "white", size: 12 };
+                    var optionsGUIText = {position: "relative", x: 10,y: 0, text: "Game Over<br /><br />You have failed to save your family :(<br /> Thanks for playing<br /><br />", color: "white", size: 12 };
                     var textForWindow = new CASTORGUI.GUIText("textInfo", optionsGUIText, guisystem, false);
                     form.add(textForWindow);
                     form.setVisible(true);
-                    setTimeout(function(){location.reload();}, 3000);
+                    setTimeout(function(){location.reload();}, 5000);
                     canvas.dispose();
                     break;
             }
@@ -522,13 +525,261 @@
                 torus.position = crosshair.position;
             }
         }
-        // End of setCrosshair function
 
-        scene.onDispose = function(){
-            canvas.removeEventListener("pointerdown", onPointerDown);
-            canvas.removeEventListener("pointerup", onPointerUp);
-            canvas.removeEventListener("mousemove");
+        // Defining function for shooting animation while standing
+        var isReloading = false;
+        function startGunshotAnimation(){
+            if(ammo > 0){
+                scene.beginAnimation(playerSkeleton, 20, 40, false, 1.0);
+                gunshot.play(0.3);
+                switch(ammo) {
+                    case 1:
+                        guiBullet_1.setVisible(false);
+                        ammo--;
+                        break;
+                    case 2:
+                        guiBullet_2.setVisible(false);
+                        ammo--;
+                        break;
+                    case 3:
+                        guiBullet_3.setVisible(false);
+                        ammo--;
+                        break;
+                    case 4:
+                        guiBullet_4.setVisible(false);
+                        ammo--;
+                        break;
+                    case 5:
+                        guiBullet_5.setVisible(false);
+                        ammo--;
+                        break;
+                    case 6:
+                        guiBullet_6.setVisible(false);
+                        ammo--;
+                        break;
+                    case 7:
+                        guiBullet_7.setVisible(false);
+                        ammo--;
+                        break;
+                    case 8:
+                        guiBullet_8.setVisible(false);
+                        ammo--;
+                        break;
+                    case 9:
+                        guiBullet_9.setVisible(false);
+                        ammo--;
+                        break;
+                    case 10:
+                        guiBullet_10.setVisible(false);
+                        ammo--;
+                        break;
+                }
+            }
+        };
+
+        // Defining function for shooting animation while walking
+        function startGunshotWalkingAnimation(){
+            if(ammo > 0){
+                scene.beginAnimation(playerSkeleton, 41, 59, false, 1.0);
+                gunshot.play(0.3);
+                switch(ammo) {
+                    case 1:
+                        guiBullet_1.setVisible(false);
+                        ammo--;
+                        break;
+                    case 2:
+                        guiBullet_2.setVisible(false);
+                        ammo--;
+                        break;
+                    case 3:
+                        guiBullet_3.setVisible(false);
+                        ammo--;
+                        break;
+                    case 4:
+                        guiBullet_4.setVisible(false);
+                        ammo--;
+                        break;
+                    case 5:
+                        guiBullet_5.setVisible(false);
+                        ammo--;
+                        break;
+                    case 6:
+                        guiBullet_6.setVisible(false);
+                        ammo--;
+                        break;
+                    case 7:
+                        guiBullet_7.setVisible(false);
+                        ammo--;
+                        break;
+                    case 8:
+                        guiBullet_8.setVisible(false);
+                        ammo--;
+                        break;
+                    case 9:
+                        guiBullet_9.setVisible(false);
+                        ammo--;
+                        break;
+                    case 10:
+                        guiBullet_10.setVisible(false);
+                        ammo--;
+                        break;
+                }
+            }
+        };
+
+        // Defining reload animation funciton
+        function startReloadAnimation(){
+            scene.beginAnimation(playerSkeleton, 60, 84, false, 1.0);
+            reload.play(0.5);
+            guiBullet_1.setVisible(true);
+            guiBullet_2.setVisible(true);
+            guiBullet_3.setVisible(true);
+            guiBullet_4.setVisible(true);
+            guiBullet_5.setVisible(true);
+            guiBullet_6.setVisible(true);
+            guiBullet_7.setVisible(true);
+            guiBullet_8.setVisible(true);
+            guiBullet_9.setVisible(true);
+            guiBullet_10.setVisible(true);
+        };
+
+        // Generating ammunition
+        var ammoBoxSpawned = false;
+        function generateAmmo(){
+            // Randomize the Z position for the ammo
+            var randomZ = Math.floor(Math.random() * 20);
+            var minus = Math.floor(Math.random() * 2);
+            if(minus == 1)
+                randomZ *= -1;
+
+            // Randomize the X position for the enemy
+            if(randomZ > -7 && randomZ < 7){
+                var randomX = Math.floor(Math.random() * 10) + 20;
+                var minus = Math.floor(Math.random() * 2);
+                if(minus == 1)
+                    randomX *= -1;
+            }
+            else{
+                var randomX = Math.floor(Math.random() * 30);
+                var minus = Math.floor(Math.random() * 2);
+                if(minus == 1)
+                    randomX *= -1;
+            }
+            
+            ammoBoxSpawned = true;
+            BABYLON.SceneLoader.ImportMesh("", "Object/Ammunition/", "ammunition.babylon", scene, function(newMeshes, particleSystems){
+                ammoBox = newMeshes[0];
+                ammoBox.position = new BABYLON.Vector3(randomX, 2, randomZ);
+                ammoBox.scaling = new BABYLON.Vector3(0.02, 0.02, 0.02);
+
+                ammoBox.actionManager = new BABYLON.ActionManager(scene);
+                ammoBox.actionManager.registerAction(new BABYLON.ExecuteCodeAction( { trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: player }, function(){
+                    isReloading = true;
+                    t.start();
+                    startReloadAnimation();
+                    ammo = 10;
+                    ammoBoxSpawned = false;
+                    setTimeout(removeMesh.bind(null, ammoBox), 1000);
+                }));
+            })
         }
+
+        // On Key Down Function Definition
+        function handleKeyDown(evt){
+            if (evt.keyCode==65){
+                keys.left=1;
+            }
+            if (evt.keyCode==68){
+                keys.right=1;
+            }
+            if (evt.keyCode==87){
+                keys.forward=1;
+            }
+            if (evt.keyCode==83){
+                keys.back=1;
+            }
+            if (evt.keyCode==67){
+                keys.pause=1;
+            }
+        }
+
+        // On Key Up Function Definition
+        function handleKeyUp(evt){
+            if (evt.keyCode==65){
+                keys.left=0;
+            }
+            if (evt.keyCode==68){
+                keys.right=0;
+            }
+            if (evt.keyCode==87){
+                keys.forward=0;
+            }
+            if (evt.keyCode==83){
+                keys.back=0;
+            }
+            if (evt.keyCode==67){
+                keys.pause=0;
+            }
+        }
+
+        // Function bgm music
+        function bgmMusic(){
+            afod.onended = function(){
+                afod2.play();
+            };
+            afod.play();
+        }
+
+        // Function Start Up Game
+        var score, scoreString, dialog, scoreBoard;
+        var guiTextureLost_0, guiTextureLost_25, guiTextureLost_50, guiTextureLost_75, guiTextureLost_100;
+        var guiTextureLife_0, guiTextureLife_25, guiTextureLife_50, guiTextureLife_75, guiTextureLife_100;
+        var guiBullet_1, guiBullet_2, guiBullet_3, guiBullet_4, guiBullet_5, guiBullet_6, guiBullet_7, guiBullet_8, guiBullet_9, guiBullet_10;
+
+        function startUpGame(){
+            // Preparing for the score screen
+            score = 0;
+            scoreString = score.toString();
+            dialog = new CASTORGUI.GUIDialog("dialog", {w: 150, h:70, x:guisystem.getCanvasSize().width - 149, y:0, overflow:"hidden"}, guisystem);
+            dialog.setVisible(true);
+            scoreBoard = new CASTORGUI.GUIText("scoreBoard", {size: 50, text: scoreString}, guisystem, false);
+            dialog.add(scoreBoard);
+
+            // Health Bar
+            health = 4;
+            guiTextureLost_0 = new CASTORGUI.GUITexture("lost0", "Object/HUD/grey.jpg", {w:50,h:50,x:10,y:10}, guisystem, null);
+            guiTextureLost_25 = new CASTORGUI.GUITexture("lost25", "Object/HUD/grey.jpg", {w:50,h:50,x:60,y:10}, guisystem, null);
+            guiTextureLost_50 = new CASTORGUI.GUITexture("lost50", "Object/HUD/grey.jpg", {w:50,h:50,x:110,y:10}, guisystem, null);
+            guiTextureLost_75 = new CASTORGUI.GUITexture("lost75", "Object/HUD/grey.jpg", {w:50,h:50,x:160,y:10}, guisystem, null);
+            guiTextureLost_100 = new CASTORGUI.GUITexture("lost100", "Object/HUD/grey.jpg", {w:50,h:50,x:210,y:10}, guisystem, null);
+
+            guiTextureLife_0 = new CASTORGUI.GUITexture("life0", "Object/HUD/red.jpg", {w:50,h:50,x:10,y:10}, guisystem, null);
+            guiTextureLife_25 = new CASTORGUI.GUITexture("life25", "Object/HUD/red.jpg", {w:50,h:50,x:60,y:10}, guisystem, null);
+            guiTextureLife_50 = new CASTORGUI.GUITexture("life50", "Object/HUD/red.jpg", {w:50,h:50,x:110,y:10}, guisystem, null);
+            guiTextureLife_75 = new CASTORGUI.GUITexture("life75", "Object/HUD/red.jpg", {w:50,h:50,x:160,y:10}, guisystem, null);
+            guiTextureLife_100 = new CASTORGUI.GUITexture("life100", "Object/HUD/red.jpg", {w:50,h:50,x:210,y:10}, guisystem, null);
+
+            // Total Bullets
+            ammo = 10;
+            guiBullet_1 = new CASTORGUI.GUITexture("bullet1", "Object/HUD/bullet.png", {w:10,h:50,x:10,y:80}, guisystem, null);
+            guiBullet_2 = new CASTORGUI.GUITexture("bullet2", "Object/HUD/bullet.png", {w:10,h:50,x:20,y:80}, guisystem, null);
+            guiBullet_3 = new CASTORGUI.GUITexture("bullet3", "Object/HUD/bullet.png", {w:10,h:50,x:30,y:80}, guisystem, null);
+            guiBullet_4 = new CASTORGUI.GUITexture("bullet4", "Object/HUD/bullet.png", {w:10,h:50,x:40,y:80}, guisystem, null);
+            guiBullet_5 = new CASTORGUI.GUITexture("bullet5", "Object/HUD/bullet.png", {w:10,h:50,x:50,y:80}, guisystem, null);
+            guiBullet_6 = new CASTORGUI.GUITexture("bullet6", "Object/HUD/bullet.png", {w:10,h:50,x:60,y:80}, guisystem, null);
+            guiBullet_7 = new CASTORGUI.GUITexture("bullet7", "Object/HUD/bullet.png", {w:10,h:50,x:70,y:80}, guisystem, null);
+            guiBullet_8 = new CASTORGUI.GUITexture("bullet8", "Object/HUD/bullet.png", {w:10,h:50,x:80,y:80}, guisystem, null);
+            guiBullet_9 = new CASTORGUI.GUITexture("bullet9", "Object/HUD/bullet.png", {w:10,h:50,x:90,y:80}, guisystem, null);
+            guiBullet_10 = new CASTORGUI.GUITexture("bullet10", "Object/HUD/bullet.png", {w:10,h:50,x:100,y:80}, guisystem, null);
+
+        }
+
+        // To remove the listener when the scene is disposed
+        scene.onDispose = function(){
+            window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("keyup", handleKeyUp);
+        }
+
     </script>
 </body>
 </html>

@@ -117,7 +117,7 @@
 	{
 		var contentDialog = this.getElementById(this.id);
 		contentDialog.style.zIndex = this.zIndex + 1;
-		element.style.zIndex + 2;
+		//element.style.zIndex + 2;
 		element.addElement(false, contentDialog);
 	};
 

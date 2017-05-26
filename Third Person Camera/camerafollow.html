@@ -229,7 +229,7 @@
                 animationState = false;
             }
 
-            if (keys.pause == 1) {
+            if (keys.pause) {
                 document.exitPointerLock();
                 camera.upperBetaLimit = 1.4;
                 model.rotation.y = camera.alpha * -1 - alfa;
