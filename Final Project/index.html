@@ -244,7 +244,6 @@
                 else
                     startGunshotAnimation();
 
-                if(keys.forward)
                 var pickResult = scene.pick(scene.pointerX, scene.pointerY);
                 if(pickResult.hit) {
                     var meshName = pickResult.pickedMesh.name;
@@ -280,7 +279,7 @@
         engine.runRenderLoop(function(){
             if(isStart){
                 // To generate the zombie for every 4 seconds
-                if(time % 240 == 0){
+                if(time % 300 == 0){
 
                     // To random the position of the zombie. 
                     // Whether at the north, south, east or west side of the terrain
@@ -429,7 +428,7 @@
         function importZombie(position, i){
             BABYLON.SceneLoader.ImportMesh("", "Object/Zombie/", "zombie.babylon", scene, function(newMeshes, particleSystems, skeletons){
                 var mesh = newMeshes[0];
-                var playerSkeleton = skeletons[0];
+                var zombieSkeleton = skeletons[0];
 
                 // Zombi respawn area (x, y, z)
                 // North : -10 -- 10, 0,  140 --  160
@@ -462,7 +461,7 @@
                 mesh.scaling = new BABYLON.Vector3(2.5, 2.5, 2.5);
 
                 // Starting the animation of the zombie
-                scene.beginAnimation(playerSkeleton, 1, 60, true, 1.0);
+                scene.beginAnimation(zombieSkeleton, 1, 60, true, 1.0);
                 
                 // Applying action manager to the zombies so that they will do something
                 // when they hit the house
