@@ -24,31 +24,31 @@ Bina Nusantara University International
 
 ## Contents
 
-* ### [Overview](#Overview)
-	* [Genre](#Genre)
-	* [Project Description](#Project-Description)
-	* [Core Gameplay Mechanics Brief](#Core-Gameplay-Mechanics-Brief)
-	* [Targeted Platforms](#Targeted-Platforms)
-	* [Project Scope](#Project-Scope)
-	* [Project Limitation](#Project-Limitation)
+* ### [Overview](#overview-1)
+	* [Genre](#genre)
+	* [Project Description](#project-description)
+	* [Core Gameplay Mechanics Brief](#core-gameplay-mechanics-brief)
+	* [Targeted Platforms](#targeted-platforms)
+	* [Project Scope](#project-scope)
+	* [Project Limitation](#project-limitation)
 
-* ### [Story and Gameplay](#Story-and-Gameplay)
-	* [Story](#Story)
-	* [Gameplay](#Gameplay)
+* ### [Story and Gameplay](#story-and-gameplay-1)
+	* [Story](#story)
+	* [Gameplay](#gameplay)
 
-* ### [Assets Needed](#Assets-Needed)
-	* [2D](#2D)
-	* [3D](#3D)
-	* [Animation](#Animation)
+* ### [Assets Needed](#assets-needed-1)
+	* [2D](#2d)
+	* [3D](#3d)
+	* [Animation](#animation)
 
-* ### [Schedule](#Schedule)
-	* [Week #1](#Week-#1)
-	* [Week #2](#Week-#2)
-	* [Week #3](#Week-#3)
-	* [Week #4](#Week-#4)
-	* [Week #5](#Week-#5)
+* ### [Schedule](#schedule-1)
+	* [Week #1](#week-1)
+	* [Week #2](#week-2)
+	* [Week #3](#week-3)
+	* [Week #4](#week-4)
+	* [Week #5](#week-5)
 
-* ### [Screenshot](#Screenshot)
+* ### [Screenshot](#screenshot-1)
 
 
 
